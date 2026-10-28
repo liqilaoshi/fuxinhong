@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>傅欣弘的中文演讲小小练功房 🎤</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Comic / Friendly sans-serif -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Mali:wght@500;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        candy: {
+                            pink: '#FF85A1',
+                            lightPink: '#FFE5EC',
+                            yellow: '#FFD166',
+                            green: '#06D6A0',
+                            blue: '#118AB2',
+                            purple: '#9B5DE5',
+                            bg: '#FFF8F0'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Noto Sans SC', 'sans-serif'],
+                        fun: ['Fredoka One', 'Mali', 'cursive']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #FFF8F0;
+            background-image: radial-gradient(#FFD166 1.5px, transparent 1.5px), radial-gradient(#FF85A1 1.5px, #FFF8F0 1.5px);
+            background-size: 60px 60px;
+            background-position: 0 0, 30px 30px;
+            font-family: 'Noto Sans SC', sans-serif;
+        }
+
+        /* 拼音与文字排版 */
+        .ruby-container {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0 2px;
+            vertical-align: bottom;
+        }
+        .pinyin-text {
+            font-size: 0.85rem;
+            color: #885053;
+            font-family: 'Mali', cursive;
+            font-weight: 700;
+            line-height: 1.2;
+            user-select: none;
+        }
+        .hanzi-text {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #2B2D42;
+            line-height: 1.3;
+        }
+        @media (max-width: 640px) {
+            .hanzi-text { font-size: 1.25rem; }
+            .pinyin-text { font-size: 0.75rem; }
+        }
+
+        /* 停顿与重音标示 */
+        .pause-mark {
+            color: #FF85A1;
+            font-weight: bold;
+            margin: 0 4px;
+            font-size: 1.2rem;
+            user-select: none;
+        }
+        .stress-word {
+            position: relative;
+            background: linear-gradient(120deg, rgba(255, 209, 102, 0.4) 0%, rgba(255, 209, 102, 0.8) 100%);
+            border-radius: 6px;
+            padding: 0 2px;
+        }
+        .stress-word::after {
+            content: '★';
+            position: absolute;
+            top: -12px;
+            right: -6px;
+            font-size: 10px;
+            color: #FF85A1;
+        }
+
+        /* 卡拉OK高亮动效 */
+        .highlight-word {
+            background-color: #FF85A1 !important;
+            color: white !important;
+            border-radius: 8px;
+            transform: scale(1.15);
+            transition: all 0.15s ease-in-out;
+            box-shadow: 0 4px 10px rgba(255, 133, 161, 0.4);
+            z-index: 10;
+        }
+        .highlight-word .pinyin-text, .highlight-word .hanzi-text {
+            color: white !important;
+        }
+
+        /* 可爱按钮与卡片边框 */
+        .btn-bounce {
+            transition: transform 0.1s ease, box-shadow 0.1s ease;
+        }
+        .btn-bounce:hover {
+            transform: translateY(-3px) scale(1.02);
+        }
+        .btn-bounce:active {
+            transform: translateY(1px) scale(0.98);
+        }
+
+        .cute-card {
+            border: 4px solid #FFE5EC;
+            box-shadow: 0 10px 25px -5px rgba(255, 133, 161, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+        }
+
+        /* 波浪下划线 */
+        .wavy-underline {
+            text-decoration: underline wavy #FF85A1 2px;
+            text-underline-offset: 4px;
+        }
+
+        /* 动画 */
+        @keyframes pulse-slow {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        .animate-pulse-slow {
+            animation: pulse-slow 2s infinite;
+        }
+
+        /* 自定义滚动条 */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #FFE5EC;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #FF85A1;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="min-h-screen text-gray-800 flex flex-col justify-between p-2 sm:p-4 md:p-6">
+
+    <!-- 顶部导航栏 / 标题 -->
+    <header class="max-w-4xl mx-auto w-full bg-white rounded-3xl p-4 md:p-6 cute-card mb-4 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+            <div class="w-14 h-14 bg-candy-pink text-white rounded-2xl flex items-center justify-center text-2xl shadow-md transform -rotate-6">
+                🎤
+            </div>
+            <div>
+                <h1 class="text-xl sm:text-2xl font-bold font-fun text-gray-800 flex items-center gap-2">
+                    演讲小达人 <span class="bg-candy-yellow text-xs px-2 py-1 rounded-full text-gray-800 font-sans">四年级专属</span>
+                </h1>
+                <p class="text-xs sm:text-sm text-gray-500 font-medium">傅欣弘的自我介绍 · 娃娃音纠音与记忆助手</p>
+            </div>
+        </div>
+
+        <!-- 积分与控制区 -->
+        <div class="flex items-center gap-3">
+            <div class="bg-candy-lightPink px-4 py-2 rounded-2xl flex items-center gap-2 text-candy-pink font-bold">
+                <i class="fa-solid fa-star text-candy-yellow text-lg animate-bounce"></i>
+                <span>星星积分: <span id="starCount" class="text-xl">0</span></span>
+            </div>
+            <button id="togglePinyinBtn" class="btn-bounce bg-purple-100 hover:bg-purple-200 text-purple-700 font-bold px-3 py-2 rounded-2xl text-xs sm:text-sm flex items-center gap-1 border border-purple-300">
+                <i class="fa-solid fa-language"></i> <span id="pinyinBtnText">隐藏拼音</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- 主要内容区域 -->
+    <main class="max-w-4xl mx-auto w-full flex-1 flex flex-col gap-4">
+        
+        <!-- 模式选择卡片 -->
+        <div class="bg-white rounded-2xl p-2 sm:p-3 cute-card flex flex-wrap justify-around gap-2 text-sm font-bold">
+            <button id="mode1Btn" onclick="switchMode(1)" class="flex-1 min-w-[100px] py-2 px-3 rounded-xl bg-candy-pink text-white shadow-sm flex items-center justify-center gap-2 transition-all">
+                <i class="fa-solid fa-book-open"></i> 全景学习
+            </button>
+            <button id="mode2Btn" onclick="switchMode(2)" class="flex-1 min-w-[100px] py-2 px-3 rounded-xl bg-gray-100 text-gray-600 hover:bg-candy-lightPink flex items-center justify-center gap-2 transition-all">
+                <i class="fa-solid fa-puzzle-piece"></i> 填空背诵
+            </button>
+            <button id="mode3Btn" onclick="switchMode(3)" class="flex-1 min-w-[100px] py-2 px-3 rounded-xl bg-gray-100 text-gray-600 hover:bg-candy-lightPink flex items-center justify-center gap-2 transition-all">
+                <i class="fa-solid fa-clone"></i> 逐句卡片
+            </button>
+        </div>
+
+        <!-- 娃娃音播放面板控制条 -->
+        <div class="bg-white rounded-3xl p-4 cute-card flex flex-wrap items-center justify-between gap-4 border-l-8 border-candy-pink">
+            <div class="flex items-center gap-3">
+                <button id="playAllBtn" onclick="playFullSpeech()" class="btn-bounce bg-candy-pink hover:bg-red-400 text-white font-bold px-5 py-3 rounded-2xl flex items-center gap-2 shadow-lg shadow-pink-200">
+                    <i class="fa-solid fa-circle-play text-xl"></i>
+                    <span>娃娃音示范朗读</span>
+                </button>
+                <button id="stopBtn" onclick="stopSpeech()" class="btn-bounce bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold p-3 rounded-2xl hidden" title="停止播放">
+                    <i class="fa-solid fa-square"></i>
+                </button>
+            </div>
+
+            <!-- 音调/语速参数调节（隐藏高级选项） -->
+            <div class="flex items-center gap-4 text-xs text-gray-500 bg-candy-bg p-2 rounded-xl">
+                <div class="flex items-center gap-1">
+                    <i class="fa-solid fa-child text-candy-pink"></i>
+                    <span>娃娃音音调:</span>
+                    <span id="pitchVal" class="font-bold text-candy-pink">高 (1.5)</span>
+                </div>
+                <div class="flex items-center gap-1">
+                    <i class="fa-solid fa-gauge-high text-candy-blue"></i>
+                    <span>语速:</span>
+                    <span id="rateVal" class="font-bold text-candy-blue">标准 (0.9)</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 视图 1：全景学习模式 -->
+        <div id="view1" class="bg-white rounded-3xl p-4 sm:p-8 cute-card flex-1 flex flex-col justify-between min-h-[350px]">
+            <div id="speechContentContainer" class="flex flex-wrap gap-y-6 gap-x-2 items-baseline leading-loose select-none">
+                <!-- 由 JavaScript 动态渲染全篇文章及卡拉OK文本 -->
+            </div>
+
+            <!-- 图例说明 -->
+            <div class="mt-8 pt-4 border-t border-dashed border-gray-200 flex flex-wrap items-center justify-between gap-2 text-xs text-gray-500">
+                <div class="flex items-center gap-4 flex-wrap">
+                    <span class="flex items-center gap-1"><span class="text-candy-pink font-bold">|</span> 停顿号（停顿半秒）</span>
+                    <span class="flex items-center gap-1"><span class="bg-yellow-200 px-1 rounded font-bold">黄底★</span> 重音朗读</span>
+                    <span class="flex items-center gap-1"><i class="fa-solid fa-volume-high text-candy-blue"></i> 点击任意句子可单句朗读</span>
+                </div>
+                <div class="text-candy-purple font-bold">
+                    💡 提示：跟着高亮提示一起出声读哦！
+                </div>
+            </div>
+        </div>
+
+        <!-- 视图 2：填空背诵模式 -->
+        <div id="view2" class="bg-white rounded-3xl p-4 sm:p-8 cute-card flex-1 flex-col justify-between min-h-[350px] hidden">
+            <div>
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-bold text-candy-purple flex items-center gap-2">
+                        <i class="fa-solid fa-brain"></i> 挖空挑战：点击下划线或【？】查看答案
+                    </h3>
+                    <button onclick="resetCloze()" class="text-xs bg-candy-lightPink text-candy-pink font-bold px-3 py-1 rounded-xl hover:bg-candy-pink hover:text-white transition">
+                        <i class="fa-solid fa-rotate-right"></i> 重新挖空
+                    </button>
+                </div>
+                <div id="clozeContentContainer" class="flex flex-wrap gap-y-6 gap-x-2 items-baseline leading-loose select-none">
+                    <!-- 由 JS 渲染填空卡片 -->
+                </div>
+            </div>
+            <div class="mt-6 p-3 bg-candy-bg rounded-2xl text-xs text-gray-600 flex items-center gap-2">
+                <i class="fa-solid fa-lightbulb text-candy-yellow text-lg"></i>
+                <span>小技巧：先背熟划线的重点词汇（名字、年龄、爱好、歌名），演讲时就会更流畅！</span>
+            </div>
+        </div>
+
+        <!-- 视图 3：卡片逐句模式 -->
+        <div id="view3" class="bg-white rounded-3xl p-4 sm:p-8 cute-card flex-1 flex-col justify-between min-h-[350px] hidden">
+            <div class="flex justify-between items-center mb-2">
+                <span id="cardProgress" class="text-xs font-bold bg-candy-lightPink text-candy-pink px-3 py-1 rounded-full">
+                    第 1 / 7 句
+                </span>
+                <span class="text-xs text-gray-400">单句突破，重点攻克</span>
+            </div>
+
+            <!-- 单句大卡片 -->
+            <div class="flex-1 flex flex-col items-center justify-center my-6 p-6 bg-candy-bg rounded-3xl border-2 border-dashed border-candy-pink relative group">
+                <div id="singleSentenceContainer" class="flex flex-wrap gap-y-4 gap-x-2 items-center justify-center text-center">
+                    <!-- 由 JS 渲染当前句子 -->
+                </div>
+                <button onclick="playCurrentSentenceCard()" class="mt-6 btn-bounce bg-candy-blue text-white px-5 py-2.5 rounded-2xl font-bold shadow-md flex items-center gap-2">
+                    <i class="fa-solid fa-volume-high"></i> 听示范音
+                </button>
+            </div>
+
+            <!-- 切换卡片控制按钮 -->
+            <div class="flex justify-between items-center gap-4">
+                <button id="prevCardBtn" onclick="changeCard(-1)" class="btn-bounce flex-1 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-2xl flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-arrow-left"></i> 上一句
+                </button>
+                <button id="nextCardBtn" onclick="changeCard(1)" class="btn-bounce flex-1 py-3 bg-candy-pink hover:bg-red-400 text-white font-bold rounded-2xl flex items-center justify-center gap-2 shadow-md">
+                    下一句 <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- 录音与自我练习模块 -->
+        <div class="bg-white rounded-3xl p-4 sm:p-6 cute-card flex flex-col sm:flex-row items-center justify-between gap-4 border-b-8 border-candy-yellow">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-2xl bg-candy-yellow flex items-center justify-center text-xl text-gray-800 shadow">
+                    🎙️
+                </div>
+                <div>
+                    <h3 class="font-bold text-gray-800 text-sm sm:text-base">录音录音，大声练！</h3>
+                    <p class="text-xs text-gray-500">录下自己的演讲，听听看和娃娃音示范有什么不一样吧！</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3 w-full sm:w-auto justify-end">
+                <button id="recordBtn" onclick="toggleRecording()" class="btn-bounce flex-1 sm:flex-none bg-red-500 hover:bg-red-600 text-white font-bold px-5 py-3 rounded-2xl flex items-center justify-center gap-2 shadow-md">
+                    <i id="recordIcon" class="fa-solid fa-microphone"></i>
+                    <span id="recordText">开始录音</span>
+                </button>
+                <button id="playRecordBtn" onclick="playRecordedAudio()" class="btn-bounce bg-gray-200 text-gray-400 cursor-not-allowed font-bold px-4 py-3 rounded-2xl flex items-center justify-center gap-2" disabled>
+                    <i class="fa-solid fa-play"></i>
+                    <span>听回放</span>
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- 页脚提示 -->
+    <footer class="max-w-4xl mx-auto w-full text-center py-4 text-xs text-gray-400 font-medium">
+        🎉 快乐学习中文 · 演讲练习小助手 · 祝傅欣弘同学演讲大成功！
+    </footer>
+
+    <!-- 完成演讲小小成就弹窗 Modal -->
+    <div id="rewardModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 hidden p-4">
+        <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-sm w-full text-center cute-card animate-bounce-short relative">
+            <div class="text-6xl mb-3">🏆</div>
+            <h2 class="text-2xl font-bold font-fun text-candy-pink mb-1">太棒了！演讲完成！</h2>
+            <p class="text-sm text-gray-600 mb-6">你认真听完了全篇示范，奖励 <b>+10</b> 颗小星星！进一步背背看吧！</p>
+            <div class="flex justify-center gap-2 text-2xl text-candy-yellow mb-6">
+                ⭐ ⭐ ⭐ ⭐ ⭐
+            </div>
+            <button onclick="closeRewardModal()" class="btn-bounce w-full py-3 bg-candy-pink text-white font-bold rounded-2xl shadow-lg">
+                收到！继续加油 🚀
+            </button>
+        </div>
+    </div>
+
+    <!-- JavaScript 逻辑代码 -->
+    <script>
+        /* ================= 演讲数据结构定义 ================= */
+        // 将全篇内容拆解为句子，并标注拼音、重音(stress)与停顿(pause)
+        const speechData = [
+            {
+                id: 0,
+                words: [
+                    { hz: "大", py: "dà", stress: true },
+                    { hz: "家", py: "jiā", stress: true },
+                    { hz: "好", py: "hǎo", stress: true },
+                    { hz: "，", py: "", isPunctuation: true, pause: true },
+                    { hz: "我", py: "wǒ" },
+                    { hz: "叫", py: "jiào" },
+                    { hz: "傅", py: "fù", cloze: true, keyWord: "傅" },
+                    { hz: "欣", py: "xīn", cloze: true, keyWord: "欣" },
+                    { hz: "弘", py: "hóng", cloze: true, keyWord: "弘" },
+                    { hz: "。", py: "", isPunctuation: true }
+                ]
+            },
+            {
+                id: 1,
+                words: [
+                    { hz: "我", py: "wǒ" },
+                    { hz: "是", py: "shì" },
+                    { hz: "四", py: "sì", cloze: true, keyWord: "四" },
+                    { hz: "年", py: "nián", cloze: true, keyWord: "年" },
+                    { hz: "级", py: "jí", cloze: true, keyWord: "级" },
+                    { hz: "A", py: "A", cloze: true, keyWord: "A" },
+                    { hz: "班", py: "bān", cloze: true, keyWord: "班" },
+                    { hz: "的", py: "de" },
+                    { hz: "学", py: "xué" },
+                    { hz: "生", py: "shēng" },
+                    { hz: "，", py: "", isPunctuation: true, pause: true },
+                    { hz: "我", py: "wǒ" },
+                    { hz: "今", py: "jīn" },
+                    { hz: "年", py: "nián" },
+                    { hz: "九", py: "jiǔ", stress: true, cloze: true, keyWord: "九" },
+                    { hz: "岁", py: "suì", stress: true },
+                    { hz: "了", py: "le" },
+                    { hz: "。", py: "", isPunctuation: true }
+                ]
+            },
+            {
+                id: 2,
+                words: [
+                    { hz: "我", py: "wǒ" },
+                    { hz: "喜", py: "xǐ" },
+                    { hz: "欢", py: "huan" },
+                    { hz: "看", py: "kàn" },
+                    { hz: "电", py: "diàn", cloze: true, keyWord: "看电影" },
+                    { hz: "影", py: "yǐng", cloze: true, keyWord: "看电影" },
+                    { hz: "、", py: "", isPunctuation: true, pause: true },
+                    { hz: "画", py: "huà", cloze: true, keyWord: "画画" },
+                    { hz: "画", py: "huà", cloze: true, keyWord: "画画" },
+                    { hz: "、", py: "", isPunctuation: true, pause: true },
+                    { hz: "玩", py: "wán" },
+                    { hz: "电", py: "diàn", cloze: true, keyWord: "玩电脑游戏" },
+                    { hz: "脑", py: "nǎo", cloze: true, keyWord: "玩电脑游戏" },
+                    { hz: "游", py: "yóu", cloze: true, keyWord: "玩电脑游戏" },
+                    { hz: "戏", py: "xì", cloze: true, keyWord: "玩电脑游戏" },
+                    { hz: "，", py: "", isPunctuation: true, pause: true },
+                    { hz: "做", py: "zuò" },
+                    { hz: "手", py: "shǒu", cloze: true, keyWord: "做手工" },
+                    { hz: "工", py: "gōng", cloze: true, keyWord: "做手工" },
+                    { hz: "。", py: "", isPunctuation: true }
+                ]
+            },
+            {
+                id: 3,
+                words: [
+                    { hz: "我", py: "wǒ" },
+                    { hz: "也", py: "yě" },
+                    { hz: "喜", py: "xǐ" },
+                    { hz: "欢", py: "huan" },
+                    { hz: "听", py: "tīng", stress: true },
+                    { hz: "和", py: "hé" },
+                    { hz: "唱", py: "chàng", stress: true },
+                    { hz: "中", py: "zhōng" },
+                    { hz: "文", py: "wén" },
+                    { hz: "歌", py: "gē" },
+                    { hz: "曲", py: "qǔ" },
+                    { hz: "，", py: "", isPunctuation: true, pause: true },
+                    { hz: "比", py: "bǐ" },
+                    { hz: "如", py: "rú" },
+                    { hz: "：", py: "", isPunctuation: true },
+                    { hz: "《", py: "", isPunctuation: true },
+                    { hz: "小", py: "xiǎo", cloze: true, keyWord: "小星星" },
+                    { hz: "星", py: "xīng", cloze: true, keyWord: "小星星" },
+                    { hz: "星", py: "xīng", cloze: true, keyWord: "小星星" },
+                    { hz: "》", py: "", isPunctuation: true },
+                    { hz: "、", py: "", isPunctuation: true, pause: true },
+                    { hz: "《", py: "", isPunctuation: true },
+                    { hz: "五", py: "wǔ", cloze: true, keyWord: "五只小猴子" },
+                    { hz: "只", py: "zhī", cloze: true, keyWord: "五只小猴子" },
+                    { hz: "小", py: "xiǎo", cloze: true, keyWord: "五只小猴子" },
+                    { hz: "猴", py: "hóu", cloze: true, keyWord: "五只小猴子" },
+                    { hz: "子", py: "zi", cloze: true, keyWord: "五只小猴子" },
+                    { hz: "》", py: "", isPunctuation: true },
+                    { hz: "，", py: "", isPunctuation: true }
+                ]
+            },
+            {
+                id: 4,
+                words: [
+                    { hz: "但", py: "dàn" },
+                    { hz: "是", py: "shì" },
+                    { hz: "我", py: "wǒ" },
+                    { hz: "最", py: "zuì", stress: true },
+                    { hz: "喜", py: "xǐ" },
+                    { hz: "欢", py: "huan" },
+                    { hz: "的", py: "de" },
+                    { hz: "是", py: "shì" },
+                    { hz: "《", py: "", isPunctuation: true },
+                    { hz: "挖", py: "wā", stress: true, cloze: true, keyWord: "挖呀挖呀挖" },
+                    { hz: "呀", py: "ya", cloze: true, keyWord: "挖呀挖呀挖" },
+                    { hz: "挖", py: "wā", stress: true, cloze: true, keyWord: "挖呀挖呀挖" },
+                    { hz: "呀", py: "ya", cloze: true, keyWord: "挖呀挖呀挖" },
+                    { hz: "挖", py: "wā", stress: true, cloze: true, keyWord: "挖呀挖呀挖" },
+                    { hz: "》", py: "", isPunctuation: true },
+                    { hz: "。", py: "", isPunctuation: true }
+                ]
+            },
+            {
+                id: 5,
+                words: [
+                    { hz: "因", py: "yīn" },
+                    { hz: "为", py: "wèi" },
+                    { hz: "这", py: "zhè" },
+                    { hz: "首", py: "shǒu" },
+                    { hz: "歌", py: "gē" },
+                    { hz: "很", py: "hěn" },
+                    { hz: "可", py: "kě", stress: true, cloze: true, keyWord: "可爱" },
+                    { hz: "爱", py: "ài", stress: true, cloze: true, keyWord: "可爱" },
+                    { hz: "，", py: "", isPunctuation: true, pause: true },
+                    { hz: "在", py: "zài" },
+                    { hz: "中", py: "zhōng" },
+                    { hz: "国", py: "guó" },
+                    { hz: "也", py: "yě" },
+                    { hz: "很", py: "hěn" },
+                    { hz: "流", py: "liú", cloze: true, keyWord: "流行" },
+                    { hz: "行", py: "xíng", cloze: true, keyWord: "流行" },
+                    { hz: "，", py: "", isPunctuation: true, pause: true },
+                    { hz: "是", py: "shì" },
+                    { hz: "一", py: "yī" },
+                    { hz: "首", py: "shǒu" },
+                    { hz: "大", py: "dà" },
+                    { hz: "家", py: "jiā" },
+                    { hz: "都", py: "dōu", stress: true },
+                    { hz: "爱", py: "ài" },
+                    { hz: "唱", py: "chàng" },
+                    { hz: "的", py: "de" },
+                    { hz: "歌", py: "gē" },
+                    { hz: "！", py: "", isPunctuation: true }
+                ]
+            },
+            {
+                id: 6,
+                words: [
+                    { hz: "谢", py: "xiè", stress: true },
+                    { hz: "谢", py: "xie" },
+                    { hz: "大", py: "dà" },
+                    { hz: "家", py: "jiā" },
+                    { hz: "。", py: "", isPunctuation: true }
+                ]
+            }
+        ];
+
+        /* ================= 全局状态管理 ================= */
+        let showPinyin = true;
+        let currentMode = 1;
+        let currentCardIndex = 0;
+        let stars = 0;
+
+        // TTS 语音对象
+        const synth = window.speechSynthesis;
+        let selectedVoice = null;
+        let isSpeaking = false;
+
+        // 录音相关变量
+        let mediaRecorder = null;
+        let audioChunks = [];
+        let recordedAudioUrl = null;
+        let recordedAudio = null;
+        let isRecording = false;
+
+        /* ================= 初始化与事件绑定 ================= */
+        window.onload = function() {
+            renderView1();
+            renderView2();
+            renderView3();
+            initSpeechSynthesis();
+            createWebAudioSynth(); // 内部合成简单音效
+        };
+
+        /* 拼音切换 */
+        document.getElementById('togglePinyinBtn').addEventListener('click', () => {
+            showPinyin = !showPinyin;
+            document.getElementById('pinyinBtnText').innerText = showPinyin ? "隐藏拼音" : "显示拼音";
+            
+            const pinyinElems = document.querySelectorAll('.pinyin-text');
+            pinyinElems.forEach(el => {
+                if (showPinyin) {
+                    el.classList.remove('hidden');
+                } else {
+                    el.classList.add('hidden');
+                }
+            });
+            playBeepSound(600, 0.05);
+        });
+
+        /* ================= 视图渲染逻辑 ================= */
+
+        // 视图1：渲染全景学习文本
+        function renderView1() {
+            const container = document.getElementById('speechContentContainer');
+            container.innerHTML = '';
+
+            speechData.forEach(sentence => {
+                const sentenceSpan = document.createElement('span');
+                sentenceSpan.className = "inline-flex flex-wrap items-baseline hover:bg-pink-50 p-1 rounded-2xl transition cursor-pointer group border border-transparent hover:border-pink-200";
+                sentenceSpan.title = "点击单句朗读";
+                sentenceSpan.onclick = () => playSingleSentence(sentence.id);
+
+                // 添加小喇叭按钮
+                const speakIcon = document.createElement('i');
+                speakIcon.className = "fa-solid fa-volume-high text-candy-blue text-xs mr-1 opacity-40 group-hover:opacity-100 transition";
+                sentenceSpan.appendChild(speakIcon);
+
+                sentence.words.forEach((w, wIndex) => {
+                    if (w.isPunctuation) {
+                        const puncSpan = document.createElement('span');
+                        puncSpan.className = "text-xl font-bold text-gray-700 mr-1";
+                        puncSpan.innerText = w.hz;
+                        sentenceSpan.appendChild(puncSpan);
+
+                        if (w.pause) {
+                            const pauseSpan = document.createElement('span');
+                            pauseSpan.className = "pause-mark";
+                            pauseSpan.innerText = "|";
+                            pauseSpan.title = "停顿半秒";
+                            sentenceSpan.appendChild(pauseSpan);
+                        }
+                    } else {
+                        const ruby = document.createElement('div');
+                        ruby.className = `ruby-container ${w.stress ? 'stress-word' : ''}`;
+                        ruby.id = `v1_s${sentence.id}_w${wIndex}`;
+
+                        const pySpan = document.createElement('span');
+                        pySpan.className = `pinyin-text ${showPinyin ? '' : 'hidden'}`;
+                        pySpan.innerText = w.py;
+
+                        const hzSpan = document.createElement('span');
+                        hzSpan.className = "hanzi-text";
+                        hzSpan.innerText = w.hz;
+
+                        ruby.appendChild(pySpan);
+                        ruby.appendChild(hzSpan);
+                        sentenceSpan.appendChild(ruby);
+                    }
+                });
+
+                container.appendChild(sentenceSpan);
+            });
+        }
+
+        // 视图2：渲染填空模式文本
+        function renderView2() {
+            const container = document.getElementById('clozeContentContainer');
+            container.innerHTML = '';
+
+            speechData.forEach(sentence => {
+                const sentenceSpan = document.createElement('span');
+                sentenceSpan.className = "inline-flex flex-wrap items-baseline";
+
+                sentence.words.forEach((w) => {
+                    if (w.isPunctuation) {
+                        const puncSpan = document.createElement('span');
+                        puncSpan.className = "text-xl font-bold text-gray-700 mr-1";
+                        puncSpan.innerText = w.hz;
+                        sentenceSpan.appendChild(puncSpan);
+                    } else if (w.cloze) {
+                        // 挖空词
+                        const clozeBtn = document.createElement('button');
+                        clozeBtn.className = "bg-candy-lightPink hover:bg-candy-yellow text-candy-pink hover:text-gray-800 font-bold px-2 py-0.5 mx-0.5 rounded-lg border-b-2 border-candy-pink transition transform active:scale-95 text-base";
+                        clozeBtn.innerText = "❓";
+                        clozeBtn.title = "点击显示答案";
+                        clozeBtn.onclick = function() {
+                            this.innerText = w.hz;
+                            this.className = "bg-green-100 text-green-700 font-bold px-2 py-0.5 mx-0.5 rounded-lg border-b-2 border-green-400 text-base animate-pulse-slow";
+                            addStars(1);
+                            playBeepSound(800, 0.1);
+                        };
+                        sentenceSpan.appendChild(clozeBtn);
+                    } else {
+                        const ruby = document.createElement('div');
+                        ruby.className = "ruby-container";
+
+                        const pySpan = document.createElement('span');
+                        pySpan.className = `pinyin-text ${showPinyin ? '' : 'hidden'}`;
+                        pySpan.innerText = w.py;
+
+                        const hzSpan = document.createElement('span');
+                        hzSpan.className = "hanzi-text";
+                        hzSpan.innerText = w.hz;
+
+                        ruby.appendChild(pySpan);
+                        ruby.appendChild(hzSpan);
+                        sentenceSpan.appendChild(ruby);
+                    }
+                });
+
+                container.appendChild(sentenceSpan);
+            });
+        }
+
+        // 重置填空
+        function resetCloze() {
+            renderView2();
+            playBeepSound(500, 0.08);
+        }
+
+        // 视图3：渲染卡片逐句模式
+        function renderView3() {
+            const container = document.getElementById('singleSentenceContainer');
+            container.innerHTML = '';
+
+            const sentence = speechData[currentCardIndex];
+            document.getElementById('cardProgress').innerText = `第 ${currentCardIndex + 1} / ${speechData.length} 句`;
+
+            sentence.words.forEach((w) => {
+                if (w.isPunctuation) {
+                    const puncSpan = document.createElement('span');
+                    puncSpan.className = "text-3xl font-bold text-gray-700 mr-1";
+                    puncSpan.innerText = w.hz;
+                    container.appendChild(puncSpan);
+                } else {
+                    const ruby = document.createElement('div');
+                    ruby.className = `ruby-container ${w.stress ? 'stress-word' : ''} transform scale-110 m-1`;
+
+                    const pySpan = document.createElement('span');
+                    pySpan.className = `pinyin-text text-sm ${showPinyin ? '' : 'hidden'}`;
+                    pySpan.innerText = w.py;
+
+                    const hzSpan = document.createElement('span');
+                    hzSpan.className = "hanzi-text text-2xl sm:text-3xl";
+                    hzSpan.innerText = w.hz;
+
+                    ruby.appendChild(pySpan);
+                    ruby.appendChild(hzSpan);
+                    container.appendChild(ruby);
+                }
+            });
+
+            // 禁用/启用卡片翻页按钮
+            document.getElementById('prevCardBtn').disabled = currentCardIndex === 0;
+            document.getElementById('prevCardBtn').style.opacity = currentCardIndex === 0 ? "0.5" : "1";
+
+            document.getElementById('nextCardBtn').disabled = currentCardIndex === speechData.length - 1;
+            document.getElementById('nextCardBtn').style.opacity = currentCardIndex === speechData.length - 1 ? "0.5" : "1";
+        }
+
+        function changeCard(dir) {
+            currentCardIndex += dir;
+            if (currentCardIndex < 0) currentCardIndex = 0;
+            if (currentCardIndex >= speechData.length) currentCardIndex = speechData.length - 1;
+            renderView3();
+            playBeepSound(700, 0.05);
+        }
+
+        function playCurrentSentenceCard() {
+            playSingleSentence(currentCardIndex);
+        }
+
+        /* ================= 模式切换 ================= */
+        function switchMode(mode) {
+            currentMode = mode;
+            document.getElementById('view1').classList.add('hidden');
+            document.getElementById('view2').classList.add('hidden');
+            document.getElementById('view3').classList.add('hidden');
+
+            document.getElementById('mode1Btn').className = "flex-1 min-w-[100px] py-2 px-3 rounded-xl bg-gray-100 text-gray-600 hover:bg-candy-lightPink flex items-center justify-center gap-2 transition-all";
+            document.getElementById('mode2Btn').className = "flex-1 min-w-[100px] py-2 px-3 rounded-xl bg-gray-100 text-gray-600 hover:bg-candy-lightPink flex items-center justify-center gap-2 transition-all";
+            document.getElementById('mode3Btn').className = "flex-1 min-w-[100px] py-2 px-3 rounded-xl bg-gray-100 text-gray-600 hover:bg-candy-lightPink flex items-center justify-center gap-2 transition-all";
+
+            if (mode === 1) {
+                document.getElementById('view1').classList.remove('hidden');
+                document.getElementById('mode1Btn').className = "flex-1 min-w-[100px] py-2 px-3 rounded-xl bg-candy-pink text-white shadow-sm flex items-center justify-center gap-2 transition-all";
+            } else if (mode === 2) {
+                document.getElementById('view2').classList.remove('hidden');
+                document.getElementById('mode2Btn').className = "flex-1 min-w-[100px] py-2 px-3 rounded-xl bg-candy-pink text-white shadow-sm flex items-center justify-center gap-2 transition-all";
+            } else if (mode === 3) {
+                document.getElementById('view3').classList.remove('hidden');
+                document.getElementById('mode3Btn').className = "flex-1 min-w-[100px] py-2 px-3 rounded-xl bg-candy-pink text-white shadow-sm flex items-center justify-center gap-2 transition-all";
+            }
+            playBeepSound(650, 0.06);
+        }
+
+        /* ================= Web Speech API (TTS 娃娃音) ================= */
+
+        function initSpeechSynthesis() {
+            if ('speechSynthesis' in window) {
+                // 监听语音库加载
+                synth.onvoiceschanged = () => {
+                    const voices = synth.getVoices();
+                    // 优先选择中文普通话发音 (zh-CN, Xiaoxiao, Hiujin, Tingting 等自然音色)
+                    selectedVoice = voices.find(v => v.lang.includes('zh') || v.lang.includes('CN')) || voices[0];
+                };
+            }
+        }
+
+        // 设置甜美娃娃音参数 (High Pitch: 1.5, Rate: 0.95)
+        function createCuteUtterance(text) {
+            const utter = new SpeechSynthesisUtterance(text);
+            utter.pitch = 1.5; // 高音调，塑造可爱童声娃娃音效果
+            utter.rate = 0.9;   // 稍缓的语速，适合小学生清晰发音示范
+            if (selectedVoice) utter.voice = selectedVoice;
+            utter.lang = 'zh-CN';
+            return utter;
+        }
+
+        // 全篇朗读并实现卡拉OK高亮同步
+        function playFullSpeech() {
+            if (isSpeaking) {
+                stopSpeech();
+                return;
+            }
+
+            stopSpeech();
+            isSpeaking = true;
+            document.getElementById('playAllBtn').classList.add('bg-red-400');
+            document.getElementById('playAllBtn').querySelector('span').innerText = "暂停朗读";
+            document.getElementById('stopBtn').classList.remove('hidden');
+
+            // 构建卡拉OK词汇队列
+            let queue = [];
+            speechData.forEach(sentence => {
+                sentence.words.forEach((w, wIndex) => {
+                    if (!w.isPunctuation) {
+                        queue.push({
+                            text: w.hz,
+                            sentenceId: sentence.id,
+                            wordIndex: wIndex
+                        });
+                    }
+                });
+            });
+
+            let currentIndex = 0;
+
+            function speakNext() {
+                if (currentIndex >= queue.length || !isSpeaking) {
+                    stopSpeech();
+                    addStars(10);
+                    showRewardModal();
+                    return;
+                }
+
+                const item = queue[currentIndex];
+                const utter = createCuteUtterance(item.text);
+
+                // 高亮文字
+                clearHighlights();
+                const targetElem = document.getElementById(`v1_s${item.sentenceId}_w${item.wordIndex}`);
+                if (targetElem) targetElem.classList.add('highlight-word');
+
+                utter.onend = function() {
+                    currentIndex++;
+                    speakNext();
+                };
+
+                utter.onerror = function() {
+                    currentIndex++;
+                    speakNext();
+                };
+
+                synth.speak(utter);
+            }
+
+            speakNext();
+        }
+
+        // 单句朗读
+        function playSingleSentence(sentenceId) {
+            stopSpeech();
+            const sentence = speechData.find(s => s.id === sentenceId);
+            if (!sentence) return;
+
+            // 提取汉字
+            const textToSpeak = sentence.words.map(w => w.hz).join('');
+            const utter = createCuteUtterance(textToSpeak);
+
+            // 高亮该句所有词
+            clearHighlights();
+            sentence.words.forEach((w, wIndex) => {
+                if (!w.isPunctuation) {
+                    const el = document.getElementById(`v1_s${sentenceId}_w${wIndex}`);
+                    if (el) el.classList.add('highlight-word');
+                }
+            });
+
+            utter.onend = clearHighlights;
+            utter.onerror = clearHighlights;
+
+            synth.speak(utter);
+            playBeepSound(750, 0.05);
+        }
+
+        function stopSpeech() {
+            synth.cancel();
+            isSpeaking = false;
+            clearHighlights();
+            document.getElementById('playAllBtn').classList.remove('bg-red-400');
+            document.getElementById('playAllBtn').querySelector('span').innerText = "娃娃音示范朗读";
+            document.getElementById('stopBtn').classList.add('hidden');
+        }
+
+        function clearHighlights() {
+            document.querySelectorAll('.highlight-word').forEach(el => el.classList.remove('highlight-word'));
+        }
+
+        /* ================= 麦克风录音与对比模块 ================= */
+        async function toggleRecording() {
+            if (!isRecording) {
+                // 开始录音
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    mediaRecorder = new MediaRecorder(stream);
+                    audioChunks = [];
+
+                    mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+                    mediaRecorder.onstop = () => {
+                        const audioBlob = new Blob(audioChunks, { type: 'audio/mp3' });
+                        recordedAudioUrl = URL.createObjectURL(audioBlob);
+                        recordedAudio = new Audio(recordedAudioUrl);
+
+                        // 启用播放按钮
+                        const playBtn = document.getElementById('playRecordBtn');
+                        playBtn.disabled = false;
+                        playBtn.className = "btn-bounce bg-candy-green hover:bg-emerald-500 text-white font-bold px-4 py-3 rounded-2xl flex items-center justify-center gap-2 shadow-md";
+                        
+                        addStars(5);
+                    };
+
+                    mediaRecorder.start();
+                    isRecording = true;
+
+                    document.getElementById('recordBtn').className = "btn-bounce flex-1 sm:flex-none bg-gray-700 text-white font-bold px-5 py-3 rounded-2xl flex items-center justify-center gap-2 shadow-md animate-pulse";
+                    document.getElementById('recordIcon').className = "fa-solid fa-square";
+                    document.getElementById('recordText').innerText = "停止录音";
+
+                } catch (err) {
+                    alert("请允许访问麦克风以体验录音对比功能哦！");
+                }
+            } else {
+                // 停止录音
+                mediaRecorder.stop();
+                // 停止所有音频轨道
+                mediaRecorder.stream.getTracks().forEach(track => track.stop());
+                isRecording = false;
+
+                document.getElementById('recordBtn').className = "btn-bounce flex-1 sm:flex-none bg-red-500 hover:bg-red-600 text-white font-bold px-5 py-3 rounded-2xl flex items-center justify-center gap-2 shadow-md";
+                document.getElementById('recordIcon').className = "fa-solid fa-microphone";
+                document.getElementById('recordText').innerText = "重新录音";
+            }
+        }
+
+        function playRecordedAudio() {
+            if (recordedAudio) {
+                recordedAudio.play();
+                playBeepSound(880, 0.08);
+            }
+        }
+
+        /* ================= 奖励体系与音效 ================= */
+        function addStars(num) {
+            stars += num;
+            document.getElementById('starCount').innerText = stars;
+        }
+
+        function showRewardModal() {
+            document.getElementById('rewardModal').classList.remove('hidden');
+            playWinSound();
+        }
+
+        function closeRewardModal() {
+            document.getElementById('rewardModal').classList.add('hidden');
+        }
+
+        // Web Audio API 简单的无外部依赖音效生成器
+        let audioCtx = null;
+        function createWebAudioSynth() {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            if (AudioContext) {
+                audioCtx = new AudioContext();
+            }
+        }
+
+        function playBeepSound(freq, duration) {
+            if (!audioCtx) return;
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + duration);
+            } catch(e) {}
+        }
+
+        function playWinSound() {
+            if (!audioCtx) return;
+            const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+            notes.forEach((freq, idx) => {
+                setTimeout(() => {
+                    playBeepSound(freq, 0.15);
+                }, idx * 120);
+            });
+        }
+    </script>
+</body>
+</html>
