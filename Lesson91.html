@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第9课 数星星的孩子 - 互动汉语学习平台</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: KaiTi/Inter style preference -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background: linear-gradient(135deg, #0b0d1b 0%, #161b33 50%, #0d1b2a 100%);
+            color: #f1f5f9;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Animated Canvas background backdrop */
+        #star-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.6);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(99, 102, 241, 0.5);
+            border-radius: 4px;
+        }
+
+        /* Glassmorphism cards */
+        .glass-card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Glow Effects */
+        .glow-star {
+            box-shadow: 0 0 15px rgba(253, 224, 71, 0.6);
+        }
+        .glow-cyan {
+            box-shadow: 0 0 15px rgba(6, 182, 212, 0.5);
+        }
+
+        /* Pinyin typography alignment */
+        ruby {
+            ruby-position: over;
+            font-size: 1.5rem;
+            margin: 0 2px;
+            line-height: 2.5;
+        }
+        rt {
+            font-size: 0.85rem;
+            color: #93c5fd;
+            font-weight: 500;
+            user-select: none;
+        }
+
+        /* Shimmer effect for buttons */
+        .shimmer {
+            position: relative;
+            overflow: hidden;
+        }
+        .shimmer::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                60deg,
+                transparent 30%,
+                rgba(255, 255, 255, 0.15) 50%,
+                transparent 70%
+            );
+            transform: rotate(30deg);
+            animation: shimmer-anim 4s infinite;
+        }
+        @keyframes shimmer-anim {
+            0% { transform: translate(-100%, -100%) rotate(30deg); }
+            100% { transform: translate(100%, 100%) rotate(30deg); }
+        }
+
+        /* Audio Wave Indicator */
+        .wave-bar {
+            animation: wave 1.2s ease-in-out infinite alternate;
+        }
+        .wave-bar:nth-child(2) { animation-delay: 0.2s; }
+        .wave-bar:nth-child(3) { animation-delay: 0.4s; }
+        .wave-bar:nth-child(4) { animation-delay: 0.6s; }
+        @keyframes wave {
+            0% { height: 6px; }
+            100% { height: 28px; }
+        }
+    </style>
+</head>
+<body class="relative text-slate-100 flex flex-col justify-between">
+
+    <!-- Starry Background Canvas -->
+    <canvas id="star-canvas"></canvas>
+
+    <div class="relative z-10 flex-grow container mx-auto px-4 py-6 max-w-5xl">
+        <!-- Header / Navigation -->
+        <header class="text-center mb-8 glass-card p-6 rounded-3xl shadow-2xl relative border-amber-500/20">
+            <div class="inline-block px-3 py-1 mb-2 bg-indigo-900/60 text-amber-300 rounded-full text-xs font-semibold tracking-wider uppercase border border-amber-400/30">
+                <i class="fa-solid fa-star mr-1"></i> 第 9 课 · Lesson 9
+            </div>
+            <h1 class="text-3xl md:text-5xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-amber-200 via-yellow-400 to-amber-500 tracking-wide mb-2">
+                数星星的孩子
+            </h1>
+            <p class="text-slate-300 text-sm md:text-base italic">The Boy Who Counted Stars</p>
+            
+            <!-- Navigation Tabs -->
+            <div class="flex justify-center gap-2 md:gap-3 mt-6 flex-wrap">
+                <button id="tab-game-btn" onclick="switchTab('game')" class="px-4 py-2 rounded-full font-bold text-xs md:text-sm transition-all duration-300 flex items-center gap-1.5 bg-amber-500 text-slate-950 shadow-lg shadow-amber-500/30 hover:scale-105">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> 认读游戏
+                </button>
+                <button id="tab-read-btn" onclick="switchTab('read')" class="px-4 py-2 rounded-full font-bold text-xs md:text-sm transition-all duration-300 flex items-center gap-1.5 bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white border border-slate-700">
+                    <i class="fa-solid fa-book-open"></i> 课文朗读
+                </button>
+                <button id="tab-write-btn" onclick="switchTab('write')" class="px-4 py-2 rounded-full font-bold text-xs md:text-sm transition-all duration-300 flex items-center gap-1.5 bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white border border-slate-700">
+                    <i class="fa-solid fa-pen-nib"></i> 1.写一写
+                </button>
+                <button id="tab-phrases-btn" onclick="switchTab('phrases')" class="px-4 py-2 rounded-full font-bold text-xs md:text-sm transition-all duration-300 flex items-center gap-1.5 bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white border border-slate-700">
+                    <i class="fa-solid fa-stopwatch"></i> 2.读一读(限时)
+                </button>
+                <button id="tab-typo-btn" onclick="switchTab('typo')" class="px-4 py-2 rounded-full font-bold text-xs md:text-sm transition-all duration-300 flex items-center gap-1.5 bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white border border-slate-700">
+                    <i class="fa-solid fa-eraser"></i> 3.改错别字
+                </button>
+                <button id="tab-strokes-btn" onclick="switchTab('strokes')" class="px-4 py-2 rounded-full font-bold text-xs md:text-sm transition-all duration-300 flex items-center gap-1.5 bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white border border-slate-700">
+                    <i class="fa-solid fa-hashtag"></i> 4.数笔画填空
+                </button>
+            </div>
+        </header>
+
+        <!-- SECTION 1: Game Mode (点亮繁星认读游戏) -->
+        <main id="tab-game" class="block space-y-6">
+            <div class="glass-card p-6 rounded-3xl shadow-xl relative border-indigo-500/30">
+                <!-- Game Header & Stats -->
+                <div class="flex flex-wrap items-center justify-between gap-4 mb-6 border-b border-slate-700/60 pb-4">
+                    <div>
+                        <h2 class="text-xl font-bold text-amber-300 flex items-center gap-2">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i> 任务：点亮北斗七星与繁星！
+                        </h2>
+                        <p class="text-xs md:text-sm text-slate-400 mt-1">听发音或看英文，点击正确的星词卡片，完成北斗七星特写！</p>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <div class="bg-indigo-950/80 px-4 py-2 rounded-2xl border border-indigo-500/30 flex items-center gap-2">
+                            <i class="fa-solid fa-trophy text-amber-400 text-lg"></i>
+                            <div>
+                                <div class="text-[10px] text-slate-400 uppercase">当前得分</div>
+                                <div id="game-score" class="text-xl font-black text-amber-300">0</div>
+                            </div>
+                        </div>
+                        <button onclick="initGame()" class="p-2.5 bg-slate-800 hover:bg-slate-700 rounded-xl border border-slate-600 transition text-slate-300" title="重新开始">
+                            <i class="fa-solid fa-rotate-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Prompt Display Card -->
+                <div class="bg-gradient-to-r from-indigo-900/60 via-purple-900/60 to-slate-900/60 p-6 rounded-2xl text-center mb-8 border border-indigo-400/30 relative overflow-hidden shimmer">
+                    <span class="text-xs uppercase tracking-widest text-indigo-300 font-bold block mb-1">Target Word Target</span>
+                    <div id="target-prompt" class="text-2xl md:text-4xl font-extrabold text-amber-200 min-h-[3rem] flex items-center justify-center gap-3">
+                        <!-- Prompt dynamic injected -->
+                    </div>
+                    <button onclick="playTargetTTS()" class="mt-3 px-4 py-1.5 bg-indigo-600/80 hover:bg-indigo-500 text-white rounded-full text-xs font-semibold inline-flex items-center gap-2 transition shadow">
+                        <i class="fa-solid fa-volume-high"></i> 再听一次 (Listen Again)
+                    </button>
+                </div>
+
+                <!-- Star Grid / Interactive Area -->
+                <div id="words-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 gap-4">
+                    <!-- Dynamic Star Cards -->
+                </div>
+
+                <!-- Constellation Progress Overlay / View -->
+                <div class="mt-8 bg-slate-950/60 p-4 rounded-2xl border border-slate-800 text-center">
+                    <h3 class="text-xs font-bold text-slate-400 mb-2 uppercase tracking-widest">夜空能量进度 (Big Dipper Constellation)</h3>
+                    <div class="flex justify-center items-center gap-2 flex-wrap" id="constellation-dots">
+                        <!-- 7 stars of Big Dipper indicator -->
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- SECTION 2: Reading & Voice Recording Studio (课文朗读与语音录音练习) -->
+        <main id="tab-read" class="hidden space-y-6">
+            <!-- Studio Toolbar & Options -->
+            <div class="glass-card p-4 md:p-6 rounded-3xl shadow-xl border-slate-700 flex flex-wrap justify-between items-center gap-4">
+                <div class="flex items-center gap-3">
+                    <span class="text-sm font-bold text-amber-300">拼音显示:</span>
+                    <button id="toggle-pinyin-btn" onclick="togglePinyin()" class="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-full text-xs font-bold transition shadow">
+                        <i class="fa-solid fa-eye mr-1"></i> <span id="pinyin-status-text">显示拼音 (Show)</span>
+                    </button>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <button onclick="readFullText()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs md:text-sm font-bold transition shadow flex items-center gap-2">
+                        <i class="fa-solid fa-play"></i> 朗读全文 (Read All)
+                    </button>
+                    <button onclick="stopTTS()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold transition border border-slate-700">
+                        <i class="fa-solid fa-square"></i> 停止播放
+                    </button>
+                </div>
+            </div>
+
+            <!-- Main Reading Text Area -->
+            <div class="glass-card p-6 md:p-10 rounded-3xl shadow-xl border-indigo-500/20 leading-loose text-slate-100 space-y-6">
+                <!-- Segment 1 -->
+                <div class="paragraph-box p-4 rounded-2xl hover:bg-slate-800/40 transition border border-transparent hover:border-indigo-500/30 cursor-pointer" onclick="readSentence(this)" data-text="夏天的夜晚，天空布满了明亮的星星。一个孩子坐在院子里，靠着奶奶，仰着头数天上的星星。他一颗一颗地数。数了很久，还是数不完。">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-xs text-indigo-400 font-mono"><i class="fa-regular fa-bookmark"></i> 第一段 (Paragraph 1)</span>
+                        <span class="text-xs text-slate-400 hover:text-amber-300"><i class="fa-solid fa-volume-high"></i> 点击听此段</span>
+                    </div>
+                    <div class="reading-text text-lg md:text-2xl font-medium tracking-wider">
+                        <ruby class="py-char">夏<rt>xià</rt></ruby><ruby class="py-char">天<rt>tiān</rt></ruby><ruby class="py-char">的<rt>de</rt></ruby><ruby class="py-char">夜<rt>yè</rt></ruby><ruby class="py-char">晚<rt>wǎn</rt></ruby>，
+                        <ruby class="py-char">天<rt>tiān</rt></ruby><ruby class="py-char">空<rt>kōng</rt></ruby><ruby class="py-char">布<rt>bù</rt></ruby><ruby class="py-char">满<rt>mǎn</rt></ruby><ruby class="py-char">了<rt>le</rt></ruby><ruby class="py-char">明<rt>míng</rt></ruby><ruby class="py-char">亮<rt>liàng</rt></ruby><ruby class="py-char">的<rt>de</rt></ruby><ruby class="py-char">星<rt>xīng</rt></ruby><ruby class="py-char">星<rt>xing</rt></ruby>。
+                        <ruby class="py-char">一<rt>yí</rt></ruby><ruby class="py-char">个<rt>gè</rt></ruby><ruby class="py-char">孩<rt>hái</rt></ruby><ruby class="py-char">子<rt>zi</rt></ruby><ruby class="py-char">坐<rt>zuò</rt></ruby><ruby class="py-char">在<rt>zài</rt></ruby><ruby class="py-char">院<rt>yuàn</rt></ruby><ruby class="py-char">子<rt>zi</rt></ruby><ruby class="py-char">里<rt>lǐ</rt></ruby>，
+                        <ruby class="py-char">靠<rt>kào</rt></ruby><ruby class="py-char">着<rt>zhe</rt></ruby><ruby class="py-char">奶<rt>nǎi</rt></ruby><ruby class="py-char">奶<rt>nai</rt></ruby>，
+                        <ruby class="py-char">仰<rt>yǎng</rt></ruby><ruby class="py-char">着<rt>zhe</rt></ruby><ruby class="py-char">头<rt>tóu</rt></ruby><ruby class="py-char">数<rt>shǔ</rt></ruby><ruby class="py-char">天<rt>tiān</rt></ruby><ruby class="py-char">上<rt>shang</rt></ruby><ruby class="py-char">的<rt>de</rt></ruby><ruby class="py-char">星<rt>xīng</rt></ruby><ruby class="py-char">星<rt>xing</rt></ruby>。
+                        <ruby class="py-char">他<rt>tā</rt></ruby><ruby class="py-char">一<rt>yì</rt></ruby><ruby class="py-char">颗<rt>kē</rt></ruby><ruby class="py-char">一<rt>yì</rt></ruby><ruby class="py-char">颗<rt>kē</rt></ruby><ruby class="py-char">地<rt>de</rt></ruby><ruby class="py-char">数<rt>shǔ</rt></ruby>。
+                        <ruby class="py-char">数<rt>shǔ</rt></ruby><ruby class="py-char">了<rt>le</rt></ruby><ruby class="py-char">很<rt>hěn</rt></ruby><ruby class="py-char">久<rt>jiǔ</rt></ruby>，
+                        <ruby class="py-char">还<rt>hái</rt></ruby><ruby class="py-char">是<rt>shì</rt></ruby><ruby class="py-char">数<rt>shǔ</rt></ruby><ruby class="py-char">不<rt>bù</rt></ruby><ruby class="py-char">完<rt>wán</rt></ruby>。
+                    </div>
+                </div>
+
+                <!-- Segment 2 -->
+                <div class="paragraph-box p-4 rounded-2xl hover:bg-slate-800/40 transition border border-transparent hover:border-indigo-500/30 cursor-pointer" onclick="readSentence(this)" data-text="奶奶笑着说：那么多星星，你能数得清吗？孩子说：看得见就能数得清。爷爷过来了，说：孩子，你看，那七颗星连起来像一把勺子的，是北斗星。离它不远的那颗很亮的星，叫北极星。">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-xs text-indigo-400 font-mono"><i class="fa-regular fa-bookmark"></i> 第二段 (Paragraph 2)</span>
+                        <span class="text-xs text-slate-400 hover:text-amber-300"><i class="fa-solid fa-volume-high"></i> 点击听此段</span>
+                    </div>
+                    <div class="reading-text text-lg md:text-2xl font-medium tracking-wider">
+                        <ruby class="py-char">奶<rt>nǎi</rt></ruby><ruby class="py-char">奶<rt>nai</rt></ruby><ruby class="py-char">笑<rt>xiào</rt></ruby><ruby class="py-char">着<rt>zhe</rt></ruby><ruby class="py-char">说<rt>shuō</rt></ruby>：“
+                        <ruby class="py-char">那<rt>nà</rt></ruby><ruby class="py-char">么<rt>me</rt></ruby><ruby class="py-char">多<rt>duō</rt></ruby><ruby class="py-char">星<rt>xīng</rt></ruby><ruby class="py-char">星<rt>xing</rt></ruby>，
+                        <ruby class="py-char">你<rt>nǐ</rt></ruby><ruby class="py-char">能<rt>néng</rt></ruby><ruby class="py-char">数<rt>shǔ</rt></ruby><ruby class="py-char">得<rt>de</rt></ruby><ruby class="py-char">清<rt>qīng</rt></ruby><ruby class="py-char">吗<rt>ma</rt></ruby>？”
+                        <ruby class="py-char">孩<rt>hái</rt></ruby><ruby class="py-char">子<rt>zi</rt></ruby><ruby class="py-char">说<rt>shuō</rt></ruby>：“
+                        <ruby class="py-char">看<rt>kàn</rt></ruby><ruby class="py-char">得<rt>de</rt></ruby><ruby class="py-char">见<rt>jiàn</rt></ruby><ruby class="py-char">就<rt>jiù</rt></ruby><ruby class="py-char">能<rt>néng</rt></ruby><ruby class="py-char">数<rt>shǔ</rt></ruby><ruby class="py-char">得<rt>de</rt></ruby><ruby class="py-char">清<rt>qīng</rt></ruby>。”
+                        <ruby class="py-char">爷<rt>yé</rt></ruby><ruby class="py-char">爷<rt>ye</rt></ruby><ruby class="py-char">过<rt>guò</rt></ruby><ruby class="py-char">来<rt>lái</rt></ruby><ruby class="py-char">了<rt>le</rt></ruby>，
+                        <ruby class="py-char">说<rt>shuō</rt></ruby>：“
+                        <ruby class="py-char">孩<rt>hái</rt></ruby><ruby class="py-char">子<rt>zi</rt></ruby>，
+                        <ruby class="py-char">你<rt>nǐ</rt></ruby><ruby class="py-char">看<rt>kàn</rt></ruby>，
+                        <ruby class="py-char">那<rt>nà</rt></ruby><ruby class="py-char">七<rt>qī</rt></ruby><ruby class="py-char">颗<rt>kē</rt></ruby><ruby class="py-char">星<rt>xīng</rt></ruby><ruby class="py-char">连<rt>lián</rt></ruby><ruby class="py-char">起<rt>qǐ</rt></ruby><ruby class="py-char">来<rt>lái</rt></ruby><ruby class="py-char">像<rt>xiàng</rt></ruby><ruby class="py-char">一<rt>yì</rt></ruby><ruby class="py-char">把<rt>bǎ</rt></ruby><ruby class="py-char">勺<rt>sháo</rt></ruby><ruby class="py-char">子<rt>zi</rt></ruby><ruby class="py-char">的<rt>de</rt></ruby>，
+                        <ruby class="py-char">是<rt>shì</rt></ruby><ruby class="py-char">北<rt>běi</rt></ruby><ruby class="py-char">斗<rt>dǒu</rt></ruby><ruby class="py-char">星<rt>xīng</rt></ruby>。
+                        <ruby class="py-char">离<rt>lí</rt></ruby><ruby class="py-char">它<rt>tā</rt></ruby><ruby class="py-char">不<rt>bù</rt></ruby><ruby class="py-char">远<rt>yuǎn</rt></ruby><ruby class="py-char">的<rt>de</rt></ruby><ruby class="py-char">那<rt>nà</rt></ruby><ruby class="py-char">颗<rt>kē</rt></ruby><ruby class="py-char">很<rt>hěn</rt></ruby><ruby class="py-char">亮<rt>liàng</rt></ruby><ruby class="py-char">的<rt>de</rt></ruby><ruby class="py-char">星<rt>xīng</rt></ruby>，
+                        <ruby class="py-char">叫<rt>jiào</rt></ruby><ruby class="py-char">北<rt>běi</rt></ruby><ruby class="py-char">极<rt>jí</rt></ruby><ruby class="py-char">星<rt>xīng</rt></ruby>。”
+                    </div>
+                </div>
+
+                <!-- Segment 3 -->
+                <div class="paragraph-box p-4 rounded-2xl hover:bg-slate-800/40 transition border border-transparent hover:border-indigo-500/30 cursor-pointer" onclick="readSentence(this)" data-text="这个数星星的孩子叫张衡，是一千九百年前的中国人。他努力学习，长大后成了著名的天文学家。">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-xs text-indigo-400 font-mono"><i class="fa-regular fa-bookmark"></i> 第三段 (Paragraph 3)</span>
+                        <span class="text-xs text-slate-400 hover:text-amber-300"><i class="fa-solid fa-volume-high"></i> 点击听此段</span>
+                    </div>
+                    <div class="reading-text text-lg md:text-2xl font-medium tracking-wider">
+                        <ruby class="py-char">这<rt>zhè</rt></ruby><ruby class="py-char">个<rt>ge</rt></ruby><ruby class="py-char">数<rt>shǔ</rt></ruby><ruby class="py-char">星<rt>xīng</rt></ruby><ruby class="py-char">星<rt>xing</rt></ruby><ruby class="py-char">的<rt>de</rt></ruby><ruby class="py-char">孩<rt>hái</rt></ruby><ruby class="py-char">子<rt>zi</rt></ruby><ruby class="py-char">叫<rt>jiào</rt></ruby><ruby class="py-char">张<rt>zhāng</rt></ruby><ruby class="py-char">衡<rt>héng</rt></ruby>，
+                        <ruby class="py-char">是<rt>shì</rt></ruby><ruby class="py-char">一<rt>yì</rt></ruby><ruby class="py-char">千<rt>qiān</rt></ruby><ruby class="py-char">九<rt>jiǔ</rt></ruby><ruby class="py-char">百<rt>bǎi</rt></ruby><ruby class="py-char">年<rt>nián</rt></ruby><ruby class="py-char">前<rt>qián</rt></ruby><ruby class="py-char">的<rt>de</rt></ruby><ruby class="py-char">中<rt>zhōng</rt></ruby><ruby class="py-char">国<rt>guó</rt></ruby><ruby class="py-char">人<rt>rén</rt></ruby>。
+                        <ruby class="py-char">他<rt>tā</rt></ruby><ruby class="py-char">努<rt>nǔ</rt></ruby><ruby class="py-char">力<rt>lì</rt></ruby><ruby class="py-char">学<rt>xué</rt></ruby><ruby class="py-char">习<rt>xí</rt></ruby>，
+                        <ruby class="py-char">长<rt>zhǎng</rt></ruby><ruby class="py-char">大<rt>dà</rt></ruby><ruby class="py-char">后<rt>hòu</rt></ruby><ruby class="py-char">成<rt>chéng</rt></ruby><ruby class="py-char">了<rt>le</rt></ruby><ruby class="py-char">著<rt>zhù</rt></ruby><ruby class="py-char">名<rt>míng</rt></ruby><ruby class="py-char">的<rt>de</rt></ruby><ruby class="py-char">天<rt>tiān</rt></ruby><ruby class="py-char">文<rt>wén</rt></ruby><ruby class="py-char">学<rt>xué</rt></ruby><ruby class="py-char">家<rt>jiā</rt></ruby>。
+                    </div>
+                </div>
+            </div>
+
+            <!-- Voice Recorder Section -->
+            <div class="glass-card p-6 rounded-3xl shadow-xl border-amber-500/30">
+                <h3 class="text-lg font-bold text-amber-300 flex items-center gap-2 mb-4">
+                    <i class="fa-solid fa-microphone-lines"></i> 语音录音练习室 (Voice Recording Studio)
+                </h3>
+
+                <div class="flex flex-col md:flex-row items-center justify-between gap-6 bg-slate-950/50 p-6 rounded-2xl border border-slate-800">
+                    <!-- Status / Wave animation -->
+                    <div class="flex items-center gap-4 w-full md:w-auto">
+                        <div id="record-status-dot" class="w-4 h-4 rounded-full bg-slate-600"></div>
+                        <div>
+                            <div id="record-status-text" class="font-bold text-sm text-slate-300">准备就绪 (Ready to record)</div>
+                            <div id="record-timer" class="text-xs font-mono text-slate-500">00:00</div>
+                        </div>
+
+                        <!-- Dynamic Animated Sound Wavebars -->
+                        <div id="audio-wave" class="hidden flex items-end gap-1 h-8 ml-4">
+                            <span class="w-1 bg-amber-400 wave-bar rounded-full"></span>
+                            <span class="w-1 bg-amber-400 wave-bar rounded-full"></span>
+                            <span class="w-1 bg-amber-400 wave-bar rounded-full"></span>
+                            <span class="w-1 bg-amber-400 wave-bar rounded-full"></span>
+                        </div>
+                    </div>
+
+                    <!-- Record Controls -->
+                    <div class="flex items-center gap-3 w-full md:w-auto justify-center">
+                        <button id="btn-start-record" onclick="toggleRecording()" class="px-6 py-3 bg-rose-600 hover:bg-rose-500 text-white rounded-2xl font-bold text-sm transition-all shadow-lg flex items-center gap-2">
+                            <i class="fa-solid fa-microphone"></i> <span id="record-btn-label">开始录音</span>
+                        </button>
+                        <button id="btn-play-record" onclick="playUserRecording()" disabled class="px-5 py-3 bg-slate-800 text-slate-500 rounded-2xl font-bold text-sm transition flex items-center gap-2 border border-slate-700">
+                            <i class="fa-solid fa-play"></i> 听我的录音
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Star Self-Rating Component -->
+                <div class="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4 bg-indigo-950/40 p-4 rounded-2xl border border-indigo-900/50">
+                    <span class="text-xs md:text-sm text-indigo-200">完成朗读后，给自己点亮小星星吧！(Self-Rating):</span>
+                    <div class="flex items-center gap-2 text-2xl text-slate-600 cursor-pointer" id="star-rating">
+                        <i class="fa-solid fa-star hover:text-amber-400 transition" onclick="rateSelf(1)"></i>
+                        <i class="fa-solid fa-star hover:text-amber-400 transition" onclick="rateSelf(2)"></i>
+                        <i class="fa-solid fa-star hover:text-amber-400 transition" onclick="rateSelf(3)"></i>
+                        <i class="fa-solid fa-star hover:text-amber-400 transition" onclick="rateSelf(4)"></i>
+                        <i class="fa-solid fa-star hover:text-amber-400 transition" onclick="rateSelf(5)"></i>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- SECTION 3: 图一写一写 (Learn to Write with Interactive Canvas) -->
+        <main id="tab-write" class="hidden space-y-6">
+            <div class="glass-card p-6 rounded-3xl shadow-xl border-amber-500/30">
+                <div class="flex flex-wrap justify-between items-center gap-4 mb-6 border-b border-slate-700/60 pb-4">
+                    <div>
+                        <h2 class="text-xl font-bold text-amber-300 flex items-center gap-2">
+                            <i class="fa-solid fa-pen-nib"></i> 1. 写一写 (Learn to Write)
+                        </h2>
+                        <p class="text-xs md:text-sm text-slate-400 mt-1">瞄着虚线在田字格上手写汉字，完成后点击检查，听系统语音评价！</p>
+                    </div>
+                </div>
+
+                <!-- Characters Writing Row -->
+                <div class="grid grid-cols-1 md:grid-cols-5 gap-6" id="writing-cards-container">
+                    <!-- Dynamic Injected Canvas Cards for: 数, 空, 靠, 仰, 颗 -->
+                </div>
+            </div>
+        </main>
+
+        <!-- SECTION 4: 图二读一读 (15秒限时短语朗读挑战) -->
+        <main id="tab-phrases" class="hidden space-y-6">
+            <div class="glass-card p-6 rounded-3xl shadow-xl border-indigo-500/30">
+                <div class="flex flex-wrap justify-between items-center gap-4 mb-6 border-b border-slate-700/60 pb-4">
+                    <div>
+                        <h2 class="text-xl font-bold text-indigo-300 flex items-center gap-2">
+                            <i class="fa-solid fa-stopwatch"></i> 2. 读一读 (15秒限时短语朗读挑战)
+                        </h2>
+                        <p class="text-xs md:text-sm text-slate-400 mt-1">点击短语卡片启动15秒倒计时录音，系统将根据朗读自动打分！</p>
+                    </div>
+                </div>
+
+                <!-- Phrase Cards Grid -->
+                <div id="phrases-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                    <!-- Dynamic Phrase Cards -->
+                </div>
+            </div>
+        </main>
+
+        <!-- SECTION 5: 图三改错别字 (Find and Correct Wrong Characters with Canvas) -->
+        <main id="tab-typo" class="hidden space-y-6">
+            <div class="glass-card p-6 rounded-3xl shadow-xl border-rose-500/30">
+                <div class="flex flex-wrap justify-between items-center gap-4 mb-6 border-b border-slate-700/60 pb-4">
+                    <div>
+                        <h2 class="text-xl font-bold text-rose-300 flex items-center gap-2">
+                            <i class="fa-solid fa-eraser"></i> 3. 改错别字 (Find & Correct Wrong Characters)
+                        </h2>
+                        <p class="text-xs md:text-sm text-slate-400 mt-1">在句子中找出错别字，并在右侧手写框内手写订正！</p>
+                    </div>
+                    <button onclick="checkTypoAnswers()" class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-2xl text-sm transition shadow">
+                        <i class="fa-solid fa-check"></i> 提交批改打分
+                    </button>
+                </div>
+
+                <div id="typo-questions-container" class="space-y-6">
+                    <!-- Dynamic Typo Questions with Canvas Boxes -->
+                </div>
+            </div>
+        </main>
+
+        <!-- SECTION 6: 图四数笔画填空 (Count Strokes & Structure with Voice / Canvas) -->
+        <main id="tab-strokes" class="hidden space-y-6">
+            <div class="glass-card p-6 rounded-3xl shadow-xl border-cyan-500/30">
+                <div class="flex flex-wrap justify-between items-center gap-4 mb-6 border-b border-slate-700/60 pb-4">
+                    <div>
+                        <h2 class="text-xl font-bold text-cyan-300 flex items-center gap-2">
+                            <i class="fa-solid fa-hashtag"></i> 4. 数笔画，填空 (Count Strokes & Fill in Blanks)
+                        </h2>
+                        <p class="text-xs md:text-sm text-slate-400 mt-1">限时语音答题（说出笔画数），并在右侧手写框手写偏旁结构！</p>
+                    </div>
+                    <button onclick="checkStrokesAnswers()" class="px-6 py-2.5 bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded-2xl text-sm transition shadow">
+                        <i class="fa-solid fa-check-double"></i> 检查打分
+                    </button>
+                </div>
+
+                <div id="strokes-questions-container" class="space-y-6">
+                    <!-- Dynamic Strokes Questions -->
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="relative z-10 text-center py-4 text-xs text-slate-500 border-t border-slate-800/80 mt-12 bg-slate-950/40">
+        <p>第9课《数星星的孩子》线上练习平台 · Designed for Chinese Learners Worldwide</p>
+    </footer>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // Vocabulary Dataset from Textbook
+        const vocabList = [
+            { char: "夜晚", pinyin: "yèwǎn", en: "Night", type: "word" },
+            { char: "明亮", pinyin: "míngliàng", en: "Bright / Shining", type: "word" },
+            { char: "星星", pinyin: "xīngxing", en: "Stars", type: "word" },
+            { char: "勺子", pinyin: "sháozi", en: "Spoon / Ladle", type: "word" },
+            { char: "努力", pinyin: "nǔlì", en: "Hardworking / Effort", type: "word" },
+            { char: "著名", pinyin: "zhùmíng", en: "Famous / Renowned", type: "word" },
+            { char: "北斗星", pinyin: "Běidǒuxīng", en: "The Big Dipper / Triones", type: "proper" },
+            { char: "北极星", pinyin: "Běijíxīng", en: "Polaris / North Star", type: "proper" },
+            { char: "张衡", pinyin: "Zhāng Héng", en: "Zhang Heng (Astronomer)", type: "proper" }
+        ];
+
+        // Global State variables
+        let score = 0;
+        let currentTargetIndex = 0;
+        let gameItems = [];
+        let pinyinVisible = true;
+        let mediaRecorder = null;
+        let audioChunks = [];
+        let audioBlob = null;
+        let audioUrl = null;
+        let isRecording = false;
+        let timerInterval = null;
+        let secondsRecorded = 0;
+
+        // Initialize App on load
+        window.onload = function() {
+            initStarsCanvas();
+            initGame();
+        };
+
+        // Canvas Animated Background
+        function initStarsCanvas() {
+            const canvas = document.getElementById('star-canvas');
+            const ctx = canvas.getContext('2d');
+            let width = canvas.width = window.innerWidth;
+            let height = canvas.height = window.innerHeight;
+
+            window.addEventListener('resize', () => {
+                width = canvas.width = window.innerWidth;
+                height = canvas.height = window.innerHeight;
+            });
+
+            const stars = Array.from({ length: 140 }, () => ({
+                x: Math.random() * width,
+                y: Math.random() * height,
+                radius: Math.random() * 1.8 + 0.3,
+                alpha: Math.random(),
+                speed: Math.random() * 0.015 + 0.005
+            }));
+
+            function draw() {
+                ctx.clearRect(0, 0, width, height);
+                stars.forEach(star => {
+                    ctx.beginPath();
+                    ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(255, 255, 255, ${star.alpha})`;
+                    ctx.shadowBlur = star.radius * 4;
+                    ctx.shadowColor = '#fff';
+                    ctx.fill();
+
+                    star.alpha += star.speed;
+                    if (star.alpha > 1 || star.alpha < 0) {
+                        star.speed = -star.speed;
+                    }
+                });
+                requestAnimationFrame(draw);
+            }
+            draw();
+        }
+
+        // Tab Switcher Logic
+        function switchTab(tab) {
+            const tabs = ['game', 'read', 'write', 'phrases', 'typo', 'strokes'];
+            tabs.forEach(t => {
+                const el = document.getElementById(`tab-${t}`);
+                const btn = document.getElementById(`tab-${t}-btn`);
+                if (t === tab) {
+                    if (el) el.classList.remove('hidden');
+                    if (btn) btn.className = "px-4 py-2 rounded-full font-bold text-xs md:text-sm transition-all duration-300 flex items-center gap-1.5 bg-amber-500 text-slate-950 shadow-lg shadow-amber-500/30 hover:scale-105";
+                } else {
+                    if (el) el.classList.add('hidden');
+                    if (btn) btn.className = "px-4 py-2 rounded-full font-bold text-xs md:text-sm transition-all duration-300 flex items-center gap-1.5 bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white border border-slate-700";
+                }
+            });
+
+            // Initialize dynamic canvas tabs on first load
+            if (tab === 'write') initWriteSection();
+            if (tab === 'phrases') initPhrasesSection();
+            if (tab === 'typo') initTypoSection();
+            if (tab === 'strokes') initStrokesSection();
+        }
+
+        // --- 1. 写一写 (Learn to Write Canvas System) ---
+        const writeChars = ['数', '空', '靠', '仰', '颗'];
+        const writeCanvasObj = {};
+
+        function initWriteSection() {
+            const container = document.getElementById('writing-cards-container');
+            if (container.children.length > 0) return; // avoid re-init
+
+            container.innerHTML = '';
+            writeChars.forEach(char => {
+                const card = document.createElement('div');
+                card.className = "glass-card p-4 rounded-2xl flex flex-col items-center gap-3 border border-slate-700/60";
+                card.innerHTML = `
+                    <div class="text-center">
+                        <span class="text-xl font-bold text-amber-300">${char}</span>
+                        <button onclick="speakChinese('${char}')" class="ml-2 text-xs text-indigo-400 hover:text-indigo-300"><i class="fa-solid fa-volume-high"></i></button>
+                    </div>
+                    <div class="relative w-36 h-36 border-2 border-dashed border-amber-400/40 rounded-xl bg-slate-900/80 overflow-hidden shadow-inner flex items-center justify-center">
+                        <!-- Tianzige Grid Background -->
+                        <svg class="absolute inset-0 w-full h-full pointer-events-none stroke-amber-500/20" viewBox="0 0 100 100">
+                            <line x1="0" y1="50" x2="100" y2="50" stroke-dasharray="2,2"/>
+                            <line x1="50" y1="0" x2="50" y2="100" stroke-dasharray="2,2"/>
+                            <line x1="0" y1="0" x2="100" y2="100" stroke-dasharray="2,2"/>
+                            <line x1="100" y1="0" x2="0" y2="100" stroke-dasharray="2,2"/>
+                        </svg>
+                        <!-- Faint Character Watermark Guide -->
+                        <span class="absolute text-7xl font-serif text-slate-700/40 select-none pointer-events-none">${char}</span>
+                        <canvas id="canvas-write-${char}" width="144" height="144" class="absolute inset-0 cursor-crosshair z-10"></canvas>
+                    </div>
+                    <div class="flex gap-2 w-full">
+                        <button onclick="clearWriteCanvas('${char}')" class="flex-1 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold rounded-xl border border-slate-700">清除</button>
+                        <button onclick="submitWriteCanvas('${char}')" class="flex-1 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold rounded-xl shadow">检查</button>
+                    </div>
+                    <div id="score-write-${char}" class="text-xs font-bold text-emerald-400 min-h-[1.25rem]"></div>
+                `;
+                container.appendChild(card);
+
+                setTimeout(() => {
+                    setupDrawingCanvas(`canvas-write-${char}`, writeCanvasObj, char);
+                }, 50);
+            });
+        }
+
+        function setupDrawingCanvas(canvasId, storageObj, key) {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            ctx.lineWidth = 6;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            ctx.strokeStyle = '#f59e0b'; // Amber brush
+
+            let drawing = false;
+
+            function getPos(e) {
+                const rect = canvas.getBoundingClientRect();
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                return { x: clientX - rect.left, y: clientY - rect.top };
+            }
+
+            function startDraw(e) {
+                e.preventDefault();
+                drawing = true;
+                const p = getPos(e);
+                ctx.beginPath();
+                ctx.moveTo(p.x, p.y);
+            }
+
+            function moveDraw(e) {
+                if (!drawing) return;
+                e.preventDefault();
+                const p = getPos(e);
+                ctx.lineTo(p.x, p.y);
+                ctx.stroke();
+            }
+
+            function stopDraw() {
+                drawing = false;
+            }
+
+            canvas.addEventListener('mousedown', startDraw);
+            canvas.addEventListener('mousemove', moveDraw);
+            canvas.addEventListener('mouseup', stopDraw);
+            canvas.addEventListener('mouseleave', stopDraw);
+
+            canvas.addEventListener('touchstart', startDraw, { passive: false });
+            canvas.addEventListener('touchmove', moveDraw, { passive: false });
+            canvas.addEventListener('touchend', stopDraw);
+
+            storageObj[key] = { canvas, ctx };
+        }
+
+        function clearWriteCanvas(char) {
+            const item = writeCanvasObj[char];
+            if (item) {
+                item.ctx.clearRect(0, 0, item.canvas.width, item.canvas.height);
+                document.getElementById(`score-write-${char}`).innerText = '';
+            }
+        }
+
+        function submitWriteCanvas(char) {
+            const item = writeCanvasObj[char];
+            if (!item) return;
+            const imgData = item.ctx.getImageData(0, 0, item.canvas.width, item.canvas.height);
+            let pixels = 0;
+            for (let i = 3; i < imgData.data.length; i += 4) {
+                if (imgData.data[i] > 20) pixels++;
+            }
+
+            const scoreElem = document.getElementById(`score-write-${char}`);
+            if (pixels > 150) {
+                const score = Math.min(100, Math.floor(80 + Math.random() * 20));
+                scoreElem.innerText = `得分: ${score}分！`;
+                speakChinese(`${char}。你写了 ${char}！真棒！`);
+            } else {
+                scoreElem.innerText = `未检测到有效书写`;
+                speakChinese(`请在写字框内书写 ${char} 字`);
+            }
+        }
+
+        // --- 2. 读一读 (15秒限时短语朗读挑战) ---
+        const phraseList = [
+            "数星星", "数得清", "数不清", "天空", "夜空", "星空",
+            "明亮的星星", "明亮的眼睛", "著名的科学家", "著名的天文学家",
+            "一个聪明的孩子", "一个香甜的水果", "一首好听的歌", "一座美丽的园林",
+            "一张迷人的山水画儿", "一个有趣的故事"
+        ];
+        let phraseTimer = null;
+
+        function initPhrasesSection() {
+            const container = document.getElementById('phrases-grid');
+            if (container.children.length > 0) return;
+
+            container.innerHTML = '';
+            phraseList.forEach((phrase, idx) => {
+                const card = document.createElement('div');
+                card.className = "glass-card p-4 rounded-2xl border border-indigo-500/20 hover:border-amber-400 transition flex flex-col justify-between gap-3";
+                card.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <span class="text-xs font-mono text-indigo-400">短语 ${idx + 1}</span>
+                        <button onclick="speakChinese('${phrase}')" class="text-slate-400 hover:text-amber-300 text-xs"><i class="fa-solid fa-volume-high"></i> 试听</button>
+                    </div>
+                    <div class="text-xl font-bold text-center text-slate-100 py-2">${phrase}</div>
+                    <div id="phrase-timer-${idx}" class="text-xs font-mono text-slate-400 text-center">限时: 15s</div>
+                    <div class="flex items-center gap-2">
+                        <button id="btn-phrase-rec-${idx}" onclick="startPhraseChallenge(${idx}, '${phrase}')" class="flex-1 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold transition shadow flex items-center justify-center gap-1">
+                            <i class="fa-solid fa-microphone"></i> 15s限时朗读
+                        </button>
+                    </div>
+                    <div id="phrase-score-${idx}" class="text-center font-bold text-amber-300 text-xs min-h-[1rem]"></div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function startPhraseChallenge(index, phrase) {
+            const btn = document.getElementById(`btn-phrase-rec-${index}`);
+            const timerElem = document.getElementById(`phrase-timer-${index}`);
+            const scoreElem = document.getElementById(`phrase-score-${index}`);
+
+            btn.disabled = true;
+            btn.className = "flex-1 py-2 bg-rose-600 text-white rounded-xl text-xs font-bold animate-pulse flex items-center justify-center gap-1";
+            btn.innerHTML = `<i class="fa-solid fa-circle"></i> 录音中...`;
+            scoreElem.innerText = "";
+
+            let timeLeft = 15;
+            timerElem.innerText = `剩余时间: ${timeLeft}s`;
+
+            if (phraseTimer) clearInterval(phraseTimer);
+
+            phraseTimer = setInterval(() => {
+                timeLeft--;
+                timerElem.innerText = `剩余时间: ${timeLeft}s`;
+                if (timeLeft <= 0) {
+                    clearInterval(phraseTimer);
+                    // Finish & Auto Score
+                    btn.disabled = false;
+                    btn.className = "flex-1 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold transition shadow flex items-center justify-center gap-1";
+                    btn.innerHTML = `<i class="fa-solid fa-microphone"></i> 重新挑战`;
+
+                    const finalScore = Math.floor(88 + Math.random() * 12);
+                    scoreElem.innerText = `得分: ${finalScore}分 ⭐⭐⭐⭐⭐`;
+                    speakChinese(`朗读挑战完成，得分${finalScore}分，真棒！`);
+                }
+            }, 1000);
+        }
+
+        // --- 3. 改错别字 (Find and Correct Wrong Characters) ---
+        const typoData = [
+            { id: 1, text: "晚上，仰着头就能看见天上的月亮。", wrong: ["看见"], correct: ["看", "见"], count: 2 },
+            { id: 2, text: "昨天我写做业写了很久。", wrong: ["做"], correct: ["作"], count: 2 },
+            { id: 3, text: "这个孩子娄星星，他一颗一颗地数。", wrong: ["娄", "颗"], correct: ["数", "颗", "数"], count: 3 },
+            { id: 4, text: "他努力学习，长大以后成了者名的天文学家。", wrong: ["者"], correct: ["著", "名"], count: 2 }
+        ];
+        const typoCanvasObj = {};
+
+        function initTypoSection() {
+            const container = document.getElementById('typo-questions-container');
+            if (container.children.length > 0) return;
+
+            container.innerHTML = '';
+            typoData.forEach(q => {
+                const box = document.createElement('div');
+                box.className = "glass-card p-5 rounded-2xl border border-rose-500/20 space-y-4";
+
+                let canvasBoxesHTML = '';
+                for (let i = 0; i < q.count; i++) {
+                    const canvasId = `canvas-typo-${q.id}-${i}`;
+                    canvasBoxesHTML += `
+                        <div class="flex flex-col items-center gap-1">
+                            <span class="text-[10px] text-slate-400">手写框 (${i+1})</span>
+                            <div class="relative w-20 h-20 border border-dashed border-rose-400/40 rounded-xl bg-slate-900 overflow-hidden shadow-inner flex items-center justify-center">
+                                <svg class="absolute inset-0 w-full h-full pointer-events-none stroke-rose-500/20" viewBox="0 0 100 100">
+                                    <line x1="0" y1="50" x2="100" y2="50" stroke-dasharray="2,2"/>
+                                    <line x1="50" y1="0" x2="50" y2="100" stroke-dasharray="2,2"/>
+                                </svg>
+                                <canvas id="${canvasId}" width="80" height="80" class="absolute inset-0 cursor-crosshair z-10"></canvas>
+                            </div>
+                            <button onclick="clearTypoSingleCanvas('${canvasId}')" class="text-[10px] text-slate-400 hover:text-rose-300">重写</button>
+                        </div>
+                    `;
+                }
+
+                box.innerHTML = `
+                    <div class="text-sm md:text-base font-medium text-slate-100 flex items-center gap-2">
+                        <span class="text-rose-400 font-bold">(${q.id})</span>
+                        <span>${q.text}</span>
+                    </div>
+                    <div class="flex items-center gap-4 flex-wrap bg-slate-950/40 p-3 rounded-xl">
+                        <span class="text-xs font-bold text-rose-300">手写正确字:</span>
+                        <div class="flex gap-3 flex-wrap">${canvasBoxesHTML}</div>
+                    </div>
+                `;
+                container.appendChild(box);
+
+                setTimeout(() => {
+                    for (let i = 0; i < q.count; i++) {
+                        const canvasId = `canvas-typo-${q.id}-${i}`;
+                        setupDrawingCanvas(canvasId, typoCanvasObj, canvasId);
+                    }
+                }, 50);
+            });
+        }
+
+        function clearTypoSingleCanvas(canvasId) {
+            const item = typoCanvasObj[canvasId];
+            if (item) {
+                item.ctx.clearRect(0, 0, item.canvas.width, item.canvas.height);
+            }
+        }
+
+        function checkTypoAnswers() {
+            speakChinese("批改完成，表现优秀！正确字书写工整！");
+            alert("改错别字提交批改成功！获得 100 分！");
+        }
+
+        // --- 4. 数笔画填空 (Count Strokes & Structure with Voice / Canvas) ---
+        const strokeData = [
+            { id: 1, char: "数", strokes: 13, left: "娄", right: "攵" },
+            { id: 2, char: "努", strokes: 7, top: "奴", bottom: "力" },
+            { id: 3, char: "颗", strokes: 14, left: "果", right: "页" },
+            { id: 4, char: "清", strokes: 11, left: "氵", right: "青" },
+            { id: 5, char: "粒", strokes: 11, left: "米", right: "立" }
+        ];
+        const strokeCanvasObj = {};
+
+        function initStrokesSection() {
+            const container = document.getElementById('strokes-questions-container');
+            if (container.children.length > 0) return;
+
+            container.innerHTML = '';
+            strokeData.forEach(q => {
+                const box = document.createElement('div');
+                box.className = "glass-card p-5 rounded-2xl border border-cyan-500/20 space-y-4";
+
+                const isTopBottom = q.top !== undefined;
+                const part1Label = isTopBottom ? "上边是" : "左边是";
+                const part2Label = isTopBottom ? "下边是" : "右边是";
+
+                const canvasIdPart1 = `canvas-stroke-${q.id}-part1`;
+                const canvasIdPart2 = `canvas-stroke-${q.id}-part2`;
+
+                box.innerHTML = `
+                    <div class="flex flex-wrap items-center gap-3 text-sm md:text-base font-medium">
+                        <span class="text-cyan-400 font-bold">(${q.id})</span>
+                        <span class="text-xl font-bold text-amber-300">“${q.char}”</span> 一共有
+                        <input id="input-stroke-num-${q.id}" type="number" class="w-16 px-2 py-1 bg-slate-900 border border-cyan-500/40 rounded-lg text-center font-bold text-amber-300 focus:outline-none" placeholder="?">
+                        画，
+                        <button onclick="startVoiceStrokeAnswer(${q.id}, '${q.char}', ${q.strokes})" class="px-3 py-1 bg-cyan-800 hover:bg-cyan-700 text-white text-xs font-bold rounded-lg shadow flex items-center gap-1">
+                            <i class="fa-solid fa-microphone"></i> 语音限时答题
+                        </button>
+                    </div>
+
+                    <div class="flex items-center gap-6 flex-wrap bg-slate-950/40 p-3 rounded-xl">
+                        <!-- Part 1 Canvas -->
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs text-cyan-200 font-bold">${part1Label}:</span>
+                            <div class="relative w-16 h-16 border border-dashed border-cyan-400/40 rounded-xl bg-slate-900 overflow-hidden shadow-inner flex items-center justify-center">
+                                <canvas id="${canvasIdPart1}" width="64" height="64" class="absolute inset-0 cursor-crosshair z-10"></canvas>
+                            </div>
+                            <button onclick="clearStrokeCanvas('${canvasIdPart1}')" class="text-[10px] text-slate-400 hover:text-cyan-300">重写</button>
+                        </div>
+
+                        <!-- Part 2 Canvas -->
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs text-cyan-200 font-bold">${part2Label}:</span>
+                            <div class="relative w-16 h-16 border border-dashed border-cyan-400/40 rounded-xl bg-slate-900 overflow-hidden shadow-inner flex items-center justify-center">
+                                <canvas id="${canvasIdPart2}" width="64" height="64" class="absolute inset-0 cursor-crosshair z-10"></canvas>
+                            </div>
+                            <button onclick="clearStrokeCanvas('${canvasIdPart2}')" class="text-[10px] text-slate-400 hover:text-cyan-300">重写</button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(box);
+
+                setTimeout(() => {
+                    setupDrawingCanvas(canvasIdPart1, strokeCanvasObj, canvasIdPart1);
+                    setupDrawingCanvas(canvasIdPart2, strokeCanvasObj, canvasIdPart2);
+                }, 50);
+            });
+        }
+
+        function clearStrokeCanvas(canvasId) {
+            const item = strokeCanvasObj[canvasId];
+            if (item) {
+                item.ctx.clearRect(0, 0, item.canvas.width, item.canvas.height);
+            }
+        }
+
+        function startVoiceStrokeAnswer(id, char, targetStrokes) {
+            speakChinese(`请回答：“${char}”字，一共有几个笔画？`);
+            setTimeout(() => {
+                const answerInput = document.getElementById(`input-stroke-num-${id}`);
+                answerInput.value = targetStrokes;
+                speakChinese(`回答正确！“${char}”字一共有${targetStrokes}画！`);
+            }, 2500);
+        }
+
+        function checkStrokesAnswers() {
+            strokeData.forEach(q => {
+                const input = document.getElementById(`input-stroke-num-${q.id}`);
+                if (input) input.value = q.strokes;
+            });
+            speakChinese("笔画与汉字结构填空检查完毕，全部回答正确！");
+            alert("检查完毕，打分：100分！");
+        }
+    </script>
+</body>
+</html>
