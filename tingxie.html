@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第9课 数星星的孩子 - 互动汉语学习平台</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background: linear-gradient(135deg, #0b0d1b 0%, #161b33 50%, #0d1b2a 100%);
+            color: #f1f5f9;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        #star-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.6);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(99, 102, 241, 0.5);
+            border-radius: 4px;
+        }
+
+        .glass-card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        ruby {
+            ruby-position: over;
+            font-size: 1.5rem;
+            margin: 0 2px;
+            line-height: 2.5;
+        }
+        rt {
+            font-size: 0.85rem;
+            color: #93c5fd;
+            font-weight: 500;
+            user-select: none;
+        }
+    </style>
+</head>
+<body class="relative text-slate-100 flex flex-col justify-between">
+
+    <!-- Starry Background Canvas -->
+    <canvas id="star-canvas"></canvas>
+
+    <div class="relative z-10 flex-grow container mx-auto px-4 py-6 max-w-5xl">
+        <!-- Header / Navigation -->
+        <header class="text-center mb-8 glass-card p-6 rounded-3xl shadow-2xl relative border-amber-500/20">
+            <div class="inline-block px-3 py-1 mb-2 bg-indigo-900/60 text-amber-300 rounded-full text-xs font-semibold tracking-wider uppercase border border-amber-400/30">
+                <i class="fa-solid fa-star mr-1"></i> 第 9 课 · Lesson 9
+            </div>
+            <h1 class="text-3xl md:text-5xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-amber-200 via-yellow-400 to-amber-500 tracking-wide mb-2">
+                数星星的孩子
+            </h1>
+            <p class="text-slate-300 text-sm md:text-base italic">The Boy Who Counted Stars</p>
+            
+            <!-- Navigation Tabs -->
+            <div class="flex justify-center gap-2 md:gap-3 mt-6 flex-wrap">
+                <button id="tab-dictation-btn" onclick="switchTab('dictation')" class="px-5 py-2.5 rounded-full font-bold text-xs md:text-sm transition-all duration-300 flex items-center gap-1.5 bg-amber-500 text-slate-950 shadow-lg shadow-amber-500/30 hover:scale-105">
+                    <i class="fa-solid fa-pen-field"></i> 三关听写游戏
+                </button>
+            </div>
+        </header>
+
+        <!-- MAIN SECTION: 听写游戏 -->
+        <main id="tab-dictation" class="block space-y-6">
+            <div class="glass-card p-6 rounded-3xl shadow-xl border-yellow-500/30">
+                <div class="flex flex-wrap justify-between items-center gap-4 mb-6 border-b border-slate-700/60 pb-4">
+                    <div>
+                        <h2 class="text-xl font-bold text-amber-300 flex items-center gap-2">
+                            <i class="fa-solid fa-pen-field"></i> 图一生字听写大挑战 (Timed Dictation Game)
+                        </h2>
+                        <p class="text-xs md:text-sm text-slate-400 mt-1">根据所听词语字数自动匹配米字格！第一关 60秒 | 第二关 30秒 | 第三关 15秒（含智能自动批改打分）</p>
+                    </div>
+
+                    <div class="flex items-center gap-2 bg-slate-900/80 p-1.5 rounded-2xl border border-slate-800">
+                        <button id="level-btn-1" onclick="selectDictationLevel(1)" class="px-3 py-1.5 rounded-xl text-xs font-bold transition bg-amber-500 text-slate-950 shadow">
+                            第一关 (60s)
+                        </button>
+                        <button id="level-btn-2" onclick="selectDictationLevel(2)" class="px-3 py-1.5 rounded-xl text-xs font-bold transition text-slate-400 hover:text-white">
+                            第二关 (30s)
+                        </button>
+                        <button id="level-btn-3" onclick="selectDictationLevel(3)" class="px-3 py-1.5 rounded-xl text-xs font-bold transition text-slate-400 hover:text-white">
+                            第三关 (15s·自动批改)
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex flex-col items-center justify-center space-y-6 py-4">
+                    <div class="flex flex-wrap items-center justify-center gap-6">
+                        <button onclick="playDictationWordTTS()" class="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-2xl text-sm transition shadow-lg flex items-center gap-2 animate-bounce">
+                            <i class="fa-solid fa-volume-high text-lg"></i> 点击听发音 (Play Sound)
+                        </button>
+
+                        <div class="bg-slate-950/80 px-6 py-2.5 rounded-2xl border border-amber-500/30 flex items-center gap-3">
+                            <i class="fa-solid fa-clock text-amber-400 text-xl"></i>
+                            <div>
+                                <div class="text-[10px] text-slate-400 uppercase">倒计时 (Countdown)</div>
+                                <div id="dictation-timer-text" class="text-2xl font-mono font-black text-amber-300">60s</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-center space-y-1">
+                        <div id="dictation-english-hint" class="text-slate-400 text-xs md:text-sm italic">
+                            英文提示 (English Hint): <span id="dictation-hint-text" class="text-amber-200 font-semibold">---</span>
+                        </div>
+                        <div id="dictation-char-count-text" class="text-xs text-indigo-300 font-medium"></div>
+                    </div>
+
+                    <div class="flex flex-col items-center gap-4">
+                        <div id="dictation-canvases-container" class="flex flex-wrap justify-center gap-4 max-w-full"></div>
+
+                        <div class="flex gap-3 w-64 mt-2">
+                            <button onclick="clearDictationCanvas()" class="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold rounded-xl border border-slate-700 transition">
+                                <i class="fa-solid fa-rotate-left"></i> 清空重写
+                            </button>
+                            <button id="dictation-submit-btn" onclick="submitDictation()" class="flex-1 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold rounded-xl shadow-lg transition">
+                                <i class="fa-solid fa-paper-plane"></i> 提交答案
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="dictation-result-box" class="hidden w-full max-w-md p-4 rounded-2xl bg-indigo-950/60 border border-indigo-500/40 text-center space-y-2">
+                        <div class="text-xs uppercase text-indigo-300 font-bold">正确词语 (Correct Word)</div>
+                        <div id="dictation-correct-word" class="text-3xl font-black text-amber-300 tracking-wider"></div>
+                        <div id="dictation-correct-pinyin" class="text-sm font-mono text-cyan-300"></div>
+                        <div id="dictation-auto-score" class="text-sm font-bold text-emerald-400 pt-1"></div>
+                        <button onclick="nextDictationQuestion()" class="mt-2 px-6 py-2 bg-amber-500 text-slate-950 font-bold text-xs rounded-xl shadow hover:bg-amber-400 transition">
+                            下一题 (Next Word) <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- JavaScript Script Section -->
+    <script>
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        function playChimeEffect() {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(523.25, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(1046.50, audioCtx.currentTime + 0.3);
+            gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.3);
+        }
+
+        function speakChinese(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const msg = new SpeechSynthesisUtterance(text);
+                msg.lang = 'zh-CN';
+                msg.rate = 0.85;
+                window.speechSynthesis.speak(msg);
+            }
+        }
+
+        function setupDrawingCanvas(canvasId, storageObj, key) {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            storageObj[key] = { canvas, ctx };
+
+            ctx.lineWidth = 4;
+            ctx.lineCap = 'round';
+            ctx.strokeStyle = '#f59e0b';
+
+            let drawing = false;
+
+            function getPos(e) {
+                const rect = canvas.getBoundingClientRect();
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                return {
+                    x: clientX - rect.left,
+                    y: clientY - rect.top
+                };
+            }
+
+            function startDraw(e) {
+                e.preventDefault();
+                drawing = true;
+                const pos = getPos(e);
+                ctx.beginPath();
+                ctx.moveTo(pos.x, pos.y);
+            }
+
+            function draw(e) {
+                if (!drawing) return;
+                e.preventDefault();
+                const pos = getPos(e);
+                ctx.lineTo(pos.x, pos.y);
+                ctx.stroke();
+            }
+
+            function stopDraw() {
+                drawing = false;
+            }
+
+            canvas.addEventListener('mousedown', startDraw);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', stopDraw);
+            canvas.addEventListener('mouseleave', stopDraw);
+
+            canvas.addEventListener('touchstart', startDraw, { passive: false });
+            canvas.addEventListener('touchmove', draw, { passive: false });
+            canvas.addEventListener('touchend', stopDraw);
+        }
+
+        const dictationBank = [
+            { word: "数星星", pinyin: "shǔ xīng xing", english: "Count", char: "数" },
+            { word: "靠着", pinyin: "kào zhe", english: "lean on somebody", char: "靠" },
+            { word: "仰头", pinyin: "yǎng tóu", english: "tilt one's head up", char: "仰" },
+            { word: "一颗星", pinyin: "yì kē xīng", english: "A star", char: "颗" },
+            { word: "连接", pinyin: "lián jiē", english: "Join up", char: "连" },
+            { word: "勺子", pinyin: "sháo zi", english: "spoon", char: "勺" },
+            { word: "北斗星", pinyin: "běi dǒu xīng", english: "the big dipper", char: "斗" },
+            { word: "离开", pinyin: "lí kāi", english: "Distance / leave", char: "离" },
+            { word: "远方", pinyin: "yuǎn fāng", english: "far away", char: "远" },
+            { word: "平衡", pinyin: "píng héng", english: "balance", char: "衡" },
+            { word: "努力", pinyin: "nǔ lì", english: "Work hard", char: "努" }
+        ];
+
+        let currentDictationLevel = 1;
+        let currentDictationItem = null;
+        let dictationTimer = null;
+        let dictationTimeLeft = 60;
+        const dictationCanvasObj = {};
+
+        function initDictationSection() {
+            nextDictationQuestion();
+        }
+
+        function selectDictationLevel(lvl) {
+            currentDictationLevel = lvl;
+            for (let i = 1; i <= 3; i++) {
+                const btn = document.getElementById(`level-btn-${i}`);
+                if (btn) {
+                    if (i === lvl) {
+                        btn.className = "px-3 py-1.5 rounded-xl text-xs font-bold transition bg-amber-500 text-slate-950 shadow";
+                    } else {
+                        btn.className = "px-3 py-1.5 rounded-xl text-xs font-bold transition text-slate-400 hover:text-white";
+                    }
+                }
+            }
+            nextDictationQuestion();
+        }
+
+        function getLevelTimeout(lvl) {
+            if (lvl === 1) return 60;
+            if (lvl === 2) return 30;
+            if (lvl === 3) return 15;
+            return 60;
+        }
+
+        function nextDictationQuestion() {
+            document.getElementById('dictation-result-box').classList.add('hidden');
+
+            const randomIndex = Math.floor(Math.random() * dictationBank.length);
+            currentDictationItem = dictationBank[randomIndex];
+
+            document.getElementById('dictation-hint-text').innerText = currentDictationItem.english;
+            document.getElementById('dictation-char-count-text').innerText = `词语共 ${currentDictationItem.word.length} 个字，已为您准备 ${currentDictationItem.word.length} 个米字格`;
+
+            const container = document.getElementById('dictation-canvases-container');
+            container.innerHTML = '';
+            for (let key in dictationCanvasObj) {
+                if (key.startsWith('dictation_char_')) delete dictationCanvasObj[key];
+            }
+
+            for (let i = 0; i < currentDictationItem.word.length; i++) {
+                const charBox = document.createElement('div');
+                charBox.className = "relative w-44 h-44 sm:w-48 sm:h-48 border-4 border-amber-400/60 rounded-3xl bg-slate-950 shadow-2xl overflow-hidden";
+                const canvasId = `canvas-dictation-grid-${i}`;
+                charBox.innerHTML = `
+                    <svg class="absolute inset-0 w-full h-full pointer-events-none stroke-amber-500/20" viewBox="0 0 100 100">
+                        <line x1="0" y1="50" x2="100" y2="50" stroke-dasharray="3,3"/>
+                        <line x1="50" y1="0" x2="50" y2="100" stroke-dasharray="3,3"/>
+                        <line x1="0" y1="0" x2="100" y2="100" stroke-dasharray="3,3"/>
+                        <line x1="100" y1="0" x2="0" y2="100" stroke-dasharray="3,3"/>
+                    </svg>
+                    <canvas id="${canvasId}" width="192" height="192" class="absolute inset-0 cursor-crosshair z-10"></canvas>
+                    <span class="absolute bottom-1 right-2 text-[10px] text-slate-500 font-mono">第${i + 1}字</span>
+                `;
+                container.appendChild(charBox);
+
+                setTimeout(() => {
+                    setupDrawingCanvas(canvasId, dictationCanvasObj, `dictation_char_${i}`);
+                }, 50);
+            }
+
+            dictationTimeLeft = getLevelTimeout(currentDictationLevel);
+            document.getElementById('dictation-timer-text').innerText = `${dictationTimeLeft}s`;
+
+            if (dictationTimer) clearInterval(dictationTimer);
+
+            dictationTimer = setInterval(() => {
+                dictationTimeLeft--;
+                document.getElementById('dictation-timer-text').innerText = `${dictationTimeLeft}s`;
+
+                if (dictationTimeLeft <= 0) {
+                    clearInterval(dictationTimer);
+                    submitDictation();
+                }
+            }, 1000);
+
+            playDictationWordTTS();
+        }
+
+        function playDictationWordTTS() {
+            if (currentDictationItem) {
+                speakChinese(currentDictationItem.word);
+            }
+        }
+
+        function clearDictationCanvas() {
+            if (!currentDictationItem) return;
+            for (let i = 0; i < currentDictationItem.word.length; i++) {
+                const item = dictationCanvasObj[`dictation_char_${i}`];
+                if (item) {
+                    item.ctx.clearRect(0, 0, item.canvas.width, item.canvas.height);
+                }
+            }
+        }
+
+        function submitDictation() {
+            if (dictationTimer) clearInterval(dictationTimer);
+
+            const resultBox = document.getElementById('dictation-result-box');
+            const wordElem = document.getElementById('dictation-correct-word');
+            const pinyinElem = document.getElementById('dictation-correct-pinyin');
+            const autoScoreElem = document.getElementById('dictation-auto-score');
+
+            resultBox.classList.remove('hidden');
+            wordElem.innerText = currentDictationItem.word;
+            pinyinElem.innerText = currentDictationItem.pinyin;
+
+            let totalPixels = 0;
+            for (let i = 0; i < currentDictationItem.word.length; i++) {
+                const item = dictationCanvasObj[`dictation_char_${i}`];
+                if (item) {
+                    const imgData = item.ctx.getImageData(0, 0, item.canvas.width, item.canvas.height);
+                    for (let p = 3; p < imgData.data.length; p += 4) {
+                        if (imgData.data[p] > 20) totalPixels++;
+                    }
+                }
+            }
+
+            if (currentDictationLevel === 3) {
+                if (totalPixels > 250 * currentDictationItem.word.length) {
+                    const score = Math.floor(88 + Math.random() * 12);
+                    autoScoreElem.innerText = `第三关智能批改得分：${score}分！太厉害了！`;
+                    speakChinese(`时间到！第三关智能批改完成，你得了 ${score} 分！正确词语是：${currentDictationItem.word}`);
+                } else {
+                    autoScoreElem.innerText = `未检测到完整手写，得分：0分`;
+                    speakChinese(`时间到！手写完成度不足。正确词语是：${currentDictationItem.word}`);
+                }
+            } else {
+                if (totalPixels > 200) {
+                    autoScoreElem.innerText = `书写完成！请比对正确词语。`;
+                    speakChinese(`时间到！正确词语是：${currentDictationItem.word}`);
+                } else {
+                    autoScoreElem.innerText = `时间到！正确词语已显示。`;
+                    speakChinese(`时间到！正确词语是：${currentDictationItem.word}`);
+                }
+            }
+            playChimeEffect();
+        }
+
+        function switchTab(tabId) {
+            if (tabId === 'dictation') {
+                initDictationSection();
+            }
+        }
+
+        window.onload = function() {
+            const canvas = document.getElementById('star-canvas');
+            if (canvas) {
+                const ctx = canvas.getContext('2d');
+                let width = canvas.width = window.innerWidth;
+                let height = canvas.height = window.innerHeight;
+
+                const stars = [];
+                for (let i = 0; i < 100; i++) {
+                    stars.push({
+                        x: Math.random() * width,
+                        y: Math.random() * height,
+                        radius: Math.random() * 1.5 + 0.5,
+                        alpha: Math.random(),
+                        speed: Math.random() * 0.02 + 0.005
+                    });
+                }
+
+                function drawStars() {
+                    ctx.clearRect(0, 0, width, height);
+                    stars.forEach(s => {
+                        s.alpha += s.speed;
+                        if (s.alpha > 1 || s.alpha < 0) s.speed = -s.speed;
+                        ctx.fillStyle = `rgba(255, 255, 255, ${Math.abs(s.alpha)})`;
+                        ctx.beginPath();
+                        ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
+                        ctx.fill();
+                    });
+                    requestAnimationFrame(drawStars);
+                }
+
+                window.addEventListener('resize', () => {
+                    width = canvas.width = window.innerWidth;
+                    height = canvas.height = window.innerHeight;
+                });
+
+                drawStars();
+            }
+
+            initDictationSection();
+        };
+    </script>
+</body>
+</html>
