@@ -1,0 +1,2098 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>小学四年级中文模拟考试（第七课《司马光》& 第八课《数星星的孩子》）</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@600;700&display=swap" rel="stylesheet" />
+  <style>
+    /* 适合小学中文阅读与作答的字体与拼音排版样式 */
+    body {
+      font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+      background-color: #f4f7fb;
+      color: #1e293b;
+    }
+    .kaiti-text {
+      font-family: "KaiTi", "STKaiti", "Noto Serif SC", serif;
+    }
+    /* 拼音标注样式 */
+    ruby {
+      ruby-align: center;
+      margin: 0 1px;
+    }
+    rt {
+      font-size: 0.65em;
+      color: #4f46e5;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+    }
+    /* 田字格效果 */
+    .tianzige {
+      position: relative;
+      background-color: #fff;
+      border: 2px solid #dc2626;
+      background-image:
+        linear-gradient(to right, transparent 49%, #fca5a5 49%, #fca5a5 51%, transparent 51%),
+        linear-gradient(to bottom, transparent 49%, #fca5a5 49%, #fca5a5 51%, transparent 51%);
+      touch-action: none; /* 防止触屏手写时页面跟着滚动 */
+    }
+    /* 自定义滚动条 */
+    ::-webkit-scrollbar {
+      height: 6px;
+      width: 6px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+    .page-fade {
+      animation: fadeIn 0.25s ease-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- 顶部试卷信息栏 -->
+  <header class="bg-gradient-to-r from-indigo-600 via-blue-600 to-sky-600 text-white shadow-md sticky top-0 z-30">
+    <div class="max-w-5xl mx-auto px-4 py-3">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="bg-amber-400 text-slate-900 text-xs font-bold px-2.5 py-0.5 rounded-full">小学部 · 四年级</span>
+            <span class="text-xs bg-white/20 px-2.5 py-0.5 rounded-full">满分 100 分</span>
+          </div>
+          <h1 class="text-lg sm:text-xl font-bold mt-1 tracking-wide">
+            中文模拟考试 · 第七课《司马光》& 第八课《数星星的孩子》
+          </h1>
+        </div>
+
+        <!-- 学生姓名与班级输入 -->
+        <div class="flex flex-wrap items-center gap-2 bg-white/15 backdrop-blur-sm px-3 py-2 rounded-xl border border-white/20">
+          <div class="flex items-center gap-1.5">
+            <label for="studentName" class="text-xs font-medium text-blue-100 whitespace-nowrap">姓名：</label>
+            <input id="studentName" type="text" placeholder="请输入姓名"
+              class="w-24 sm:w-28 px-2 py-1 text-xs sm:text-sm rounded-lg bg-white text-slate-800 font-medium focus:outline-none focus:ring-2 focus:ring-amber-300" />
+          </div>
+          <div class="flex items-center gap-1.5">
+            <label for="studentClass" class="text-xs font-medium text-blue-100 whitespace-nowrap">班级：</label>
+            <input id="studentClass" type="text" value="四年级"
+              class="w-20 sm:w-24 px-2 py-1 text-xs sm:text-sm rounded-lg bg-white text-slate-800 font-medium focus:outline-none focus:ring-2 focus:ring-amber-300" />
+          </div>
+          <div class="flex items-center gap-1 text-xs font-semibold bg-indigo-900/50 px-2.5 py-1 rounded-lg">
+            <span>⏱</span>
+            <span id="timerDisplay">00:00</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 多页步骤导航条（第1题 ~ 第9题 + 成绩单与错题本） -->
+      <nav aria-label="试卷页码导航" class="mt-3 pt-2 border-t border-white/20 overflow-x-auto">
+        <div id="navSteps" class="flex items-center gap-1.5 min-w-max pb-1">
+          <!-- 由 JS 动态渲染 -->
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <!-- 全局提示消息条（替代 alert） -->
+  <div id="toastBanner" class="hidden fixed top-20 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 rounded-xl shadow-lg text-sm font-medium transition-all flex items-center gap-2">
+    <span id="toastIcon">ℹ️</span>
+    <span id="toastMessage">提示信息</span>
+  </div>
+
+  <!-- 主内容区域 -->
+  <main class="flex-1 max-w-5xl w-full mx-auto px-4 py-6">
+    <div id="pageContainer" class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-5 sm:p-8 page-fade">
+      <!-- 动态渲染当前页面（第1~9部分或成绩单/错题本） -->
+    </div>
+  </main>
+
+  <!-- 底部翻页控制栏 -->
+  <footer class="bg-white border-t border-slate-200 sticky bottom-0 z-20 shadow-inner">
+    <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
+      <button id="prevBtn" onclick="goPrevPage()"
+        class="px-4 py-2.5 rounded-xl font-medium text-sm bg-slate-100 text-slate-700 hover:bg-slate-200 disabled:opacity-40 disabled:cursor-not-allowed transition flex items-center gap-1.5">
+        <span>←</span>
+        <span>上一部分</span>
+      </button>
+
+      <div class="text-xs sm:text-sm text-slate-500 font-medium text-center" id="pageIndicator">
+        第 1 / 9 部分
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button id="nextBtn" onclick="goNextPage()"
+          class="px-5 py-2.5 rounded-xl font-medium text-sm bg-blue-600 text-white hover:bg-blue-700 shadow-sm transition flex items-center gap-1.5">
+          <span>下一部分</span>
+          <span>→</span>
+        </button>
+        <button id="submitExamBtn" onclick="openConfirmModal()"
+          class="hidden px-5 py-2.5 rounded-xl font-bold text-sm bg-emerald-600 text-white hover:bg-emerald-700 shadow-md transition flex items-center gap-1.5">
+          <span>✓ 提交试卷并自动批改</span>
+        </button>
+      </div>
+    </div>
+  </footer>
+
+  <!-- 自定义确认提交模态框（禁止使用 confirm()） -->
+  <div id="confirmModal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-100">
+      <div class="flex items-center gap-3 text-amber-600 mb-3">
+        <div class="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center text-xl">📝</div>
+        <h3 class="text-lg font-bold text-slate-800">确认提交试卷吗？</h3>
+      </div>
+      <p id="confirmSummary" class="text-sm text-slate-600 leading-relaxed mb-5">
+        系统将立即为你自动批改全卷（满分 100 分），并自动生成【专属错题本】。
+      </p>
+      <div class="flex justify-end gap-2.5">
+        <button onclick="closeConfirmModal()"
+          class="px-4 py-2 rounded-xl text-sm font-medium bg-slate-100 text-slate-700 hover:bg-slate-200 transition">
+          再检查一下
+        </button>
+        <button onclick="submitExam()"
+          class="px-5 py-2 rounded-xl text-sm font-bold bg-emerald-600 text-white hover:bg-emerald-700 shadow-sm transition">
+          确认交卷并批改
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /*************************************************************************
+     * 一、 试卷数据模型（严格对应第七课《司马光》& 第八课《数星星的孩子》，满分100分）
+     *************************************************************************/
+    const EXAM_DATA = {
+      sections: [
+        { id: 1, shortTitle: "一、看拼音写词", title: "一、看拼音，写词语。", score: 12, desc: "共 6 小题，每题 2 分。可直接用鼠标或手指在红色田字格内手写汉字，并在下方确认填写词语以便系统自动批改。" },
+        { id: 2, shortTitle: "二、汉字结构", title: "二、给下面的汉字，按照结构分类。", score: 16, desc: "共 16 个汉字，每字 1 分。请先选择下方结构框，再点击备选汉字放入框中（点击已放入的汉字可退回）。" },
+        { id: 3, shortTitle: "三、连线组词", title: "三、连一连，组词语，写在横线上。", score: 10, desc: "共 5 组，每组 2 分。先点击左侧单字，再点击右侧词语完成配对，系统会自动填入下方横线。" },
+        { id: 4, shortTitle: "四、找同部首", title: "四、根据提示找出部首相同的字。", score: 16, desc: "共 4 组，每组 4 个字，每字 1 分。先选中要填写的部首行，再点击字库中的汉字归类。" },
+        { id: 5, shortTitle: "五、单项选择", title: "五、选择正确的答案填空。", score: 6, desc: "共 6 小题，每题 1 分。请点击选择最恰当的一项。" },
+        { id: 6, shortTitle: "六、选词填空", title: "六、选词填空。", score: 10, desc: "共 5 空，每空 2 分。点击你要填写的空格，再点击词语库中的词语填入。" },
+        { id: 7, shortTitle: "七、连词成句", title: "七、连词成句。", score: 10, desc: "共 5 题，每题 2 分。按正确语序依次点击词块组合成完整句子（支持清空重排）。" },
+        { id: 8, shortTitle: "八、读一读组词", title: "八、读一读，组词语。", score: 10, desc: "共 5 题，每题 2 分。请用给出的生字组成课本中的常见词语。" },
+        { id: 9, shortTitle: "九、阅读短文", title: "九、阅读短文，完成练习。", score: 10, desc: "共 5 小题，每题 2 分。仔细阅读短文《夜晚的天空》，回答下面的问题。" }
+      ],
+
+      // 第一部分：看拼音，写词语（12分）
+      part1: [
+        { id: "p1_1", pinyin: "cōng míng", answer: "聪明", hint: "第七课《司马光》：形容脑子灵活、有智慧", lesson: "第七课" },
+        { id: "p1_2", pinyin: "bàn fǎ", answer: "办法", hint: "第七课《司马光》：处理事情或解决问题的方法", lesson: "第七课" },
+        { id: "p1_3", pinyin: "shí tou", answer: "石头", hint: "第七课《司马光》：司马光拿起一块大___", lesson: "第七课" },
+        { id: "p1_4", pinyin: "yè wǎn", answer: "夜晚", hint: "第八课《数星星的孩子》：夏天的___，天上有星星", lesson: "第八课" },
+        { id: "p1_5", pinyin: "tiān kōng", answer: "天空", hint: "第八课《数星星的孩子》：星星挂在明亮的___", lesson: "第八课" },
+        { id: "p1_6", pinyin: "nǔ lì", answer: "努力", hint: "第八课《数星星的孩子》：张衡___学习，成了天文学家", lesson: "第八课" }
+      ],
+
+      // 第二部分：汉字结构分类（16分）
+      part2: {
+        pool: ["缸", "块", "使", "砸", "救", "颗", "惊", "仰", "哭", "装", "勺", "斗", "力", "石", "大", "七"],
+        categories: [
+          { key: "leftRight", label: "左右结构", expectedCount: 8, answers: ["缸", "块", "使", "砸", "救", "颗", "惊", "仰"], explain: "左右两部分并排组成：缸(缶+工)、块(土+夬)、使(亻+吏)、砸(石+匝)、救(求+攵)、颗(果+页)、惊(忄+京)、仰(亻+卬)。" },
+          { key: "topBottom", label: "上下结构", expectedCount: 2, answers: ["哭", "装"], explain: "上下两部分叠合组成：哭(吅+犬)、装(壮+衣)。" },
+          { key: "single", label: "独体字结构", expectedCount: 6, answers: ["勺", "斗", "力", "石", "大", "七"], explain: "整体为单一结构、不可拆分为偏旁合体：勺、斗、力、石、大、七。" }
+        ]
+      },
+
+      // 第三部分：连一连，组词语（10分）
+      part3: {
+        leftItems: [
+          { id: "L1", char: "聪", matchRightId: "R1", word: "聪明" },
+          { id: "L2", char: "水", matchRightId: "R2", word: "水缸" },
+          { id: "L3", char: "使", matchRightId: "R3", word: "使劲" },
+          { id: "L4", char: "数", matchRightId: "R4", word: "数星星" },
+          { id: "L5", char: "北", matchRightId: "R5", word: "北斗星" }
+        ],
+        // 右侧故意打乱顺序供学生配对
+        rightItems: [
+          { id: "R3", text: "劲" },
+          { id: "R5", text: "斗星" },
+          { id: "R1", text: "明" },
+          { id: "R4", text: "星星" },
+          { id: "R2", text: "缸" }
+        ]
+      },
+
+      // 第四部分：根据提示找出部首相同的字（16分）
+      part4: {
+        pool: ["惊", "慌", "怕", "忙", "砸", "破", "硬", "石", "靠", "非", "排", "悲", "斗", "料", "斜", "科"],
+        groups: [
+          { key: "xin", radical: "忄（竖心旁）", answers: ["惊", "慌", "怕", "忙"], explain: "“惊、慌、怕、忙”都带有竖心旁（忄），多与心理情感有关。" },
+          { key: "shi", radical: "石（石字旁）", answers: ["砸", "破", "硬", "石"], explain: "“砸、破、硬、石”都属于石字部（石），与石头或坚硬动作有关。" },
+          { key: "fei", radical: "非（非字旁/部）", answers: ["靠", "非", "排", "悲"], explain: "第八课重点部首“非字旁——靠”，同含“非”部首的字有：靠、非、排、悲。" },
+          { key: "dou", radical: "斗（斗字旁）", answers: ["斗", "料", "斜", "科"], explain: "第八课重点部首“斗字旁——斗”，同为斗字旁的字有：斗、料、斜、科。" }
+        ]
+      },
+
+      // 第五部分：选择正确的答案填空（6分）
+      part5: [
+        {
+          id: "p5_1",
+          question: "“他们只有一个办法。”加点词“只有”的读音是（ ）。",
+          options: [
+            { label: "A", text: "zhǐ yǒu" },
+            { label: "B", text: "zhī yǒu" },
+            { label: "C", text: "zhǐ yòu" }
+          ],
+          answer: "A",
+          explain: "“只”表示“仅仅、唯有”时读第三声 zhǐ，“有”读第三声 yǒu，合起来是 zhǐ yǒu。"
+        },
+        {
+          id: "p5_2",
+          question: "大家（ ）听见“扑通”一声，有人掉进水缸里了。",
+          options: [
+            { label: "A", text: "突然" },
+            { label: "B", text: "已经" },
+            { label: "C", text: "非常" }
+          ],
+          answer: "A",
+          explain: "第七课原句：“突然，大家听到‘扑通’一声。”表示事情发生得很急促、出乎意料。"
+        },
+        {
+          id: "p5_3",
+          question: "司马光（ ）地拿起一块大石头，向水缸砸去。",
+          options: [
+            { label: "A", text: "惊慌" },
+            { label: "B", text: "冷静不慌" },
+            { label: "C", text: "大哭" }
+          ],
+          answer: "B",
+          explain: "第七课课文：“别的小朋友都吓哭了，不知道怎么办。只有司马光不惊慌。”"
+        },
+        {
+          id: "p5_4",
+          question: "“缸”字的部首是（ ），与装东西的器皿有关。",
+          options: [
+            { label: "A", text: "氵" },
+            { label: "B", text: "缶" },
+            { label: "C", text: "石" }
+          ],
+          answer: "B",
+          explain: "第七课生字表提示：“缶 —— 缸”，“缶”是古代盛水或酒的瓦器。"
+        },
+        {
+          id: "p5_5",
+          question: "“仰”字共有（ ）画，可以用“仰头”组词。",
+          options: [
+            { label: "A", text: "五画" },
+            { label: "B", text: "六画" },
+            { label: "C", text: "七画" }
+          ],
+          answer: "B",
+          explain: "“仰”的笔顺为：撇、竖、撇、竖提、横折钩、竖，共 6 画。"
+        },
+        {
+          id: "p5_6",
+          question: "根据第八课课文，张衡长大后成为了著名的（ ）。",
+          options: [
+            { label: "A", text: "画家" },
+            { label: "B", text: "天文学家" },
+            { label: "C", text: "医生" }
+          ],
+          answer: "B",
+          explain: "第八课复述课文：“张衡努力学习，长大后成了著名的天文学家。”"
+        }
+      ],
+
+      // 第六部分：选词填空（10分）
+      part6: {
+        wordBank: ["聪明", "游戏", "办法", "星星", "努力"],
+        items: [
+          { id: "p6_1", prefix: "1. 司马光是一个非常（", suffix: "）的孩子。", answer: "聪明", explain: "课文中大家都夸“司马光真聪明”。" },
+          { id: "p6_2", prefix: "2. 下课了，同学们在操场上做（", suffix: "）。", answer: "游戏", explain: "“做游戏”是第七课重点动宾搭配。" },
+          { id: "p6_3", prefix: "3. 小朋友掉进水缸里，大家想出了好（", suffix: "）。", answer: "办法", explain: "“想出了一个办法”出自第七课课文。" },
+          { id: "p6_4", prefix: "4. 夏天的夜晚，天空中有很多明亮的（", suffix: "）。", answer: "星星", explain: "第八课描述夜晚明亮的星星。" },
+          { id: "p6_5", prefix: "5. 我们要（", suffix: "）学习，长大后才能本领大。", answer: "努力", explain: "第八课重点词语“努力学习”。" }
+        ]
+      },
+
+      // 第七部分：连词成句（10分）
+      part7: [
+        {
+          id: "p7_1",
+          tokens: ["花园里", "他们", "在", "玩儿"],
+          answer: "他们在花园里玩儿。",
+          explain: "基本句型：谁 + 在哪里 + 做什么 → 他们在花园里玩儿。"
+        },
+        {
+          id: "p7_2",
+          tokens: ["爬树", "有的", "有的", "做游戏", "他们"],
+          answer: "他们有的做游戏，有的爬树。",
+          explain: "第七课重点句型：“他们有的做游戏，有的爬树。”（也可互换前后分句“他们有的爬树，有的做游戏。”）。",
+          altAnswers: ["他们有的爬树，有的做游戏。"]
+        },
+        {
+          id: "p7_3",
+          tokens: ["一块", "司马光", "大石头", "拿起"],
+          answer: "司马光拿起一块大石头。",
+          explain: "主语（司马光）+ 动作（拿起）+ 数量词与宾语（一块大石头）。"
+        },
+        {
+          id: "p7_4",
+          tokens: ["院子里", "数星星", "在", "张衡"],
+          answer: "张衡在院子里数星星。",
+          explain: "第八课课文句子：张衡在院子里数星星。"
+        },
+        {
+          id: "p7_5",
+          tokens: ["七颗星", "像勺子的", "是", "北斗星"],
+          answer: "像勺子的七颗星是北斗星。",
+          explain: "第八课课文句子：像勺子的七颗星是北斗星。"
+        }
+      ],
+
+      // 第八部分：读一读，组词语（10分）
+      part8: [
+        {
+          id: "p8_1",
+          char: "水",
+          accepted: ["水缸", "装水", "水里", "喝水", "水果", "水面", "大水", "河水", "流水"],
+          sample: "水缸 / 装水",
+          explain: "第七课拓展词语：水缸、装水、喝水等。"
+        },
+        {
+          id: "p8_2",
+          char: "砸",
+          accepted: ["砸破", "砸开", "砸去", "砸缸", "砸碎", "砸烂"],
+          sample: "砸破 / 砸开",
+          explain: "第七课“读一读”重点词语：砸破、砸开。"
+        },
+        {
+          id: "p8_3",
+          char: "救",
+          accepted: ["救人", "救命", "救走", "得救", "救出", "抢救", "救助"],
+          sample: "救人 / 救命 / 救走",
+          explain: "第七课“读一读”重点词语：救人、救命、救走、得救。"
+        },
+        {
+          id: "p8_4",
+          char: "远",
+          accepted: ["远方", "远近", "遥远", "很远", "远远", "远大", "远处"],
+          sample: "远方",
+          explain: "第八课生字表重点组词：远 —— 远方。"
+        },
+        {
+          id: "p8_5",
+          char: "离",
+          accepted: ["离开", "距离", "分离", "离去", "离别"],
+          sample: "离开",
+          explain: "第八课生字表重点组词：离 —— 离开。"
+        }
+      ],
+
+      // 第九部分：阅读短文，完成练习（10分）
+      part9: {
+        title: "夜晚的天空",
+        paragraphs: [
+          `<ruby>夏<rt>xià</rt></ruby><ruby>天<rt>tiān</rt></ruby>的<ruby>夜<rt>yè</rt></ruby><ruby>晚<rt>wǎn</rt></ruby>，<ruby>天<rt>tiān</rt></ruby><ruby>空<rt>kōng</rt></ruby>很<ruby>晴<rt>qíng</rt></ruby><ruby>朗<rt>lǎng</rt></ruby>，一闪一闪的<ruby>星<rt>xīng</rt></ruby><ruby>星<rt>xing</rt></ruby>像无数<ruby>颗<rt>kē</rt></ruby>宝石。`,
+          `小明<ruby>仰<rt>yǎng</rt></ruby>起头，<ruby>靠<rt>kào</rt></ruby>在<ruby>院<rt>yuàn</rt></ruby><ruby>子<rt>zi</rt></ruby>的椅子上<ruby>数<rt>shǔ</rt></ruby><ruby>星<rt>xīng</rt></ruby><ruby>星<rt>xing</rt></ruby>。他看见七<ruby>颗<rt>kē</rt></ruby><ruby>亮<rt>liàng</rt></ruby>晶晶的<ruby>星<rt>xīng</rt></ruby><ruby>星<rt>xing</rt></ruby><ruby>连<rt>lián</rt></ruby>在一起，形状像一把小<ruby>勺<rt>sháo</rt></ruby><ruby>子<rt>zi</rt></ruby>，这就是<ruby>北<rt>běi</rt></ruby><ruby>斗<rt>dǒu</rt></ruby><ruby>星<rt>xīng</rt></ruby>。<ruby>北<rt>běi</rt></ruby><ruby>斗<rt>dǒu</rt></ruby><ruby>星<rt>xīng</rt></ruby>旁边还有一<ruby>颗<rt>kē</rt></ruby>很<ruby>亮<rt>liàng</rt></ruby>的<ruby>星<rt>xīng</rt></ruby><ruby>星<rt>xing</rt></ruby>，是<ruby>北<rt>běi</rt></ruby><ruby>极<rt>jí</rt></ruby><ruby>星<rt>xīng</rt></ruby>。`,
+          `小明说：“我以后也要<ruby>努<rt>nǔ</rt></ruby><ruby>力<rt>lì</rt></ruby>学习，去探索宇宙的奥秘！”`
+        ],
+        questions: [
+          {
+            id: "p9_1",
+            type: "text",
+            prompt: "1. 这篇短文的题目是《",
+            suffix: "》。（2分）",
+            answer: "夜晚的天空",
+            explain: "短文正上方的标题就是《夜晚的天空》。"
+          },
+          {
+            id: "p9_2",
+            type: "text",
+            prompt: "2. 小明在（",
+            suffix: "）的椅子上，仰起头数星星。（2分）",
+            answer: "院子",
+            altAnswers: ["院子里"],
+            explain: "短文第二自然段第一句：“小明仰起头，靠在院子的椅子上数星星。”"
+          },
+          {
+            id: "p9_3",
+            type: "radio",
+            prompt: "3. 像一把小勺子的七颗星是（ ）。（2分）",
+            options: [
+              { label: "A", text: "北极星" },
+              { label: "B", text: "北斗星" },
+              { label: "C", text: "太阳" }
+            ],
+            answer: "B",
+            explain: "短文中提到：“形状像一把小勺子，这就是北斗星。”"
+          },
+          {
+            id: "p9_4",
+            type: "radio",
+            prompt: "4. 下列哪句话符合短文内容？（ ）（2分）",
+            options: [
+              { label: "A", text: "小明在教室里数星星。" },
+              { label: "B", text: "夏天的夜晚，天空中有很多星星。" },
+              { label: "C", text: "北斗星旁边没有别的星星。" }
+            ],
+            answer: "B",
+            explain: "小明在院子里数星星（A错），北斗星旁边还有北极星（C错），只有B符合短文。"
+          },
+          {
+            id: "p9_5",
+            type: "text",
+            prompt: "5. 小明以后想做什么？请用句子写出来。（2分）",
+            suffix: "",
+            answer: "我以后也要努力学习，去探索宇宙的奥秘！",
+            keywords: ["努力学习", "探索宇宙"],
+            explain: "短文最后一句：“我以后也要努力学习，去探索宇宙的奥秘！”（包含“努力学习”和“探索宇宙”即可得分）。"
+          }
+        ]
+      }
+    };
+
+    /*************************************************************************
+     * 二、 应用状态管理
+     *************************************************************************/
+    const state = {
+      currentPage: 1, // 1..9 为试卷部分，10 为成绩单与错题本页面
+      isSubmitted: false,
+      activePart2Box: "leftRight", // 当前激活的结构分类框
+      activePart3Left: null,       // 当前选中的左侧连线字 ID
+      activePart4Group: "xin",     // 当前激活的部首分组
+      activePart6Blank: "p6_1",    // 当前激活的选词填空空格 ID
+      timerSeconds: 0,
+      timerInterval: null,
+
+      // 学生作答存储
+      answers: {
+        part1: {}, // { p1_1: "..." }
+        part1Strokes: {}, // 保存每个田字格的笔画轨迹 { "p1_1_0": [[{x,y}, ...], ...], ... }
+        part2: { leftRight: [], topBottom: [], single: [] },
+        part3: {}, // { L1: "R1", ... }
+        part4: { xin: [], shi: [], fei: [], dou: [] },
+        part5: {}, // { p5_1: "A" }
+        part6: {}, // { p6_1: "聪明" }
+        part7: { p7_1: [], p7_2: [], p7_3: [], p7_4: [], p7_5: [] },
+        part8: {}, // { p8_1: "..." }
+        part9: {}  // { p9_1: "..." }
+      },
+
+      // 批改结果
+      gradingResult: null,
+      wrongBook: [],
+      wrongBookFilter: "all", // 'all' | 'unfixed' | 'fixed'
+      penWidth: 4 // 默认中等笔画粗细
+    };
+
+    /*************************************************************************
+     * 三、 初始化与计时器
+     *************************************************************************/
+    window.onload = function () {
+      loadSavedWrongBook();
+      startTimer();
+      renderAll();
+    };
+
+    function startTimer() {
+      if (state.timerInterval) clearInterval(state.timerInterval);
+      state.timerInterval = setInterval(() => {
+        if (!state.isSubmitted) {
+          state.timerSeconds++;
+          const mins = String(Math.floor(state.timerSeconds / 60)).padStart(2, "0");
+          const secs = String(state.timerSeconds % 60).padStart(2, "0");
+          const el = document.getElementById("timerDisplay");
+          if (el) el.textContent = `${mins}:${secs}`;
+        }
+      }, 1000);
+    }
+
+    function showToast(msg, type = "info") {
+      const banner = document.getElementById("toastBanner");
+      const icon = document.getElementById("toastIcon");
+      const text = document.getElementById("toastMessage");
+      const styles = {
+        info: "bg-slate-800 text-white",
+        success: "bg-emerald-600 text-white",
+        warn: "bg-amber-500 text-slate-900"
+      };
+      const icons = { info: "ℹ️", success: "✅", warn: "⚠️" };
+      banner.className = `fixed top-20 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 rounded-xl shadow-lg text-sm font-medium flex items-center gap-2 ${styles[type] || styles.info}`;
+      icon.textContent = icons[type] || "ℹ️";
+      text.textContent = msg;
+      banner.classList.remove("hidden");
+      clearTimeout(window._toastTimer);
+      window._toastTimer = setTimeout(() => banner.classList.add("hidden"), 2600);
+    }
+
+    /*************************************************************************
+     * 四、 分页与导航渲染
+     *************************************************************************/
+    function goToPage(pageNum) {
+      state.currentPage = pageNum;
+      renderAll();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function goPrevPage() {
+      if (state.currentPage > 1) {
+        goToPage(state.currentPage - 1);
+      }
+    }
+
+    function goNextPage() {
+      if (state.currentPage < 9) {
+        goToPage(state.currentPage + 1);
+      } else if (state.isSubmitted && state.currentPage === 9) {
+        goToPage(10);
+      }
+    }
+
+    function isSectionCompleted(secId) {
+      const a = state.answers;
+      switch (secId) {
+        case 1: return EXAM_DATA.part1.every(q => (a.part1[q.id] || "").trim().length > 0);
+        case 2: return (a.part2.leftRight.length + a.part2.topBottom.length + a.part2.single.length) === 16;
+        case 3: return Object.keys(a.part3).length === 5;
+        case 4: return (a.part4.xin.length + a.part4.shi.length + a.part4.fei.length + a.part4.dou.length) === 16;
+        case 5: return Object.keys(a.part5).length === 6;
+        case 6: return Object.keys(a.part6).length === 5;
+        case 7: return Object.values(a.part7).every(arr => arr.length > 0);
+        case 8: return EXAM_DATA.part8.every(q => (a.part8[q.id] || "").trim().length > 0);
+        case 9: return EXAM_DATA.part9.questions.every(q => (a.part9[q.id] || "").trim().length > 0);
+        default: return false;
+      }
+    }
+
+    function renderNavAndFooter() {
+      const nav = document.getElementById("navSteps");
+      let html = "";
+      EXAM_DATA.sections.forEach(sec => {
+        const isActive = state.currentPage === sec.id;
+        const done = isSectionCompleted(sec.id);
+        let btnClass = "px-3 py-1.5 rounded-lg text-xs font-medium transition flex items-center gap-1.5 border ";
+        if (isActive) {
+          btnClass += "bg-white text-indigo-700 border-white font-bold shadow-xs";
+        } else if (done) {
+          btnClass += "bg-emerald-500/25 text-white border-emerald-300/40 hover:bg-emerald-500/40";
+        } else {
+          btnClass += "bg-white/10 text-blue-100 border-white/15 hover:bg-white/20";
+        }
+        html += `
+          <button onclick="goToPage(${sec.id})" class="${btnClass}">
+            <span>${sec.shortTitle}</span>
+            <span class="opacity-80">(${sec.score}分)</span>
+            ${done ? '<span class="text-emerald-300 font-bold">✓</span>' : ''}
+          </button>
+        `;
+      });
+
+      // 第10页：成绩单与错题本按钮
+      const isResultActive = state.currentPage === 10;
+      const wrongCount = state.wrongBook.length;
+      html += `
+        <button onclick="handleOpenResultTab()"
+          class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 border ${
+            isResultActive
+              ? "bg-amber-400 text-slate-900 border-amber-300 shadow-xs"
+              : "bg-amber-500/25 text-amber-100 border-amber-300/40 hover:bg-amber-500/40"
+          }">
+          <span>📕 成绩单与错题本</span>
+          ${wrongCount > 0 ? `<span class="bg-rose-600 text-white px-1.5 py-0.2 rounded-full text-[11px]">${wrongCount}</span>` : ""}
+        </button>
+      `;
+      nav.innerHTML = html;
+
+      // 更新底部按钮状态
+      const prevBtn = document.getElementById("prevBtn");
+      const nextBtn = document.getElementById("nextBtn");
+      const submitBtn = document.getElementById("submitExamBtn");
+      const indicator = document.getElementById("pageIndicator");
+
+      prevBtn.disabled = state.currentPage <= 1;
+
+      if (state.currentPage === 10) {
+        indicator.textContent = "成绩单与专属错题本";
+        nextBtn.classList.add("hidden");
+        submitBtn.classList.add("hidden");
+      } else {
+        indicator.textContent = `第 ${state.currentPage} / 9 部分（本部分 ${EXAM_DATA.sections[state.currentPage - 1].score} 分）`;
+        if (state.currentPage === 9) {
+          nextBtn.classList.add("hidden");
+          submitBtn.classList.remove("hidden");
+          submitBtn.innerHTML = state.isSubmitted
+            ? "<span>🔄 重新批改并更新错题本</span>"
+            : "<span>✓ 提交试卷并自动批改</span>";
+        } else {
+          nextBtn.classList.remove("hidden");
+          submitBtn.classList.add("hidden");
+        }
+      }
+    }
+
+    function handleOpenResultTab() {
+      if (!state.isSubmitted && state.wrongBook.length === 0) {
+        showToast("请先完成答题并点击【提交试卷并自动批改】，即可查看成绩单和错题本！", "warn");
+        return;
+      }
+      goToPage(10);
+    }
+
+    function renderAll() {
+      renderNavAndFooter();
+      const container = document.getElementById("pageContainer");
+      container.classList.remove("page-fade");
+      void container.offsetWidth; // 触发重绘动画
+      container.classList.add("page-fade");
+
+      if (state.currentPage === 10) {
+        container.innerHTML = renderResultAndWrongBookPage();
+        return;
+      }
+
+      const sec = EXAM_DATA.sections[state.currentPage - 1];
+      let bodyHtml = `
+        <div class="border-b border-slate-200 pb-4 mb-6">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <h2 class="text-xl sm:text-2xl font-bold text-slate-800">${sec.title}</h2>
+            <span class="px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 font-bold text-sm border border-indigo-200">
+              满分 ${sec.score} 分
+            </span>
+          </div>
+          <p class="text-sm text-slate-500 mt-1.5">${sec.desc}</p>
+        </div>
+      `;
+
+      switch (state.currentPage) {
+        case 1: bodyHtml += renderPart1(); break;
+        case 2: bodyHtml += renderPart2(); break;
+        case 3: bodyHtml += renderPart3(); break;
+        case 4: bodyHtml += renderPart4(); break;
+        case 5: bodyHtml += renderPart5(); break;
+        case 6: bodyHtml += renderPart6(); break;
+        case 7: bodyHtml += renderPart7(); break;
+        case 8: bodyHtml += renderPart8(); break;
+        case 9: bodyHtml += renderPart9(); break;
+      }
+
+      container.innerHTML = bodyHtml;
+
+      // 如果当前在第1部分，渲染完成后初始化田字格手写画板并恢复已有笔迹
+      if (state.currentPage === 1) {
+        initPart1HandwritingCanvases();
+      }
+    }
+
+    /*************************************************************************
+     * 五、 各题型页面渲染与交互逻辑
+     *************************************************************************/
+
+    // --- 第1部分：看拼音，写词语（12分 · 支持田字格手写 + 文本确认）---
+    function renderPart1() {
+      return `
+        <!-- 笔触粗细调节栏 -->
+        <div class="flex flex-wrap items-center justify-between gap-2 bg-indigo-50/70 border border-indigo-100 rounded-xl px-4 py-2.5 mb-5">
+          <div class="text-xs sm:text-sm text-indigo-900 font-medium flex items-center gap-1.5">
+            <span>✍️</span>
+            <span>控笔提示：支持鼠标、手指或手写笔在田字格内平稳书写，已开启笔画平滑防抖。</span>
+          </div>
+          <div class="flex items-center gap-1.5 text-xs">
+            <span class="text-slate-500 font-medium">笔头粗细：</span>
+            ${[
+              { label: "细笔", w: 2.5 },
+              { label: "标准", w: 4 },
+              { label: "粗笔", w: 6 }
+            ].map(p => `
+              <button type="button" onclick="setPenWidth(${p.w})"
+                class="px-2.5 py-1 rounded-lg font-bold transition ${
+                  state.penWidth === p.w
+                    ? "bg-indigo-600 text-white shadow-xs"
+                    : "bg-white text-slate-600 border border-slate-200 hover:border-indigo-300"
+                }">
+                ${p.label}
+              </button>
+            `).join("")}
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          ${EXAM_DATA.part1.map((item, idx) => {
+            const val = state.answers.part1[item.id] || "";
+            return `
+              <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 flex flex-col items-center hover:border-indigo-300 transition">
+                <div class="w-full flex justify-between items-center text-xs text-slate-400 mb-1">
+                  <span>第 ${idx + 1} 题（2分）</span>
+                  <span class="bg-blue-100 text-blue-700 px-2 py-0.5 rounded-md font-medium">${item.lesson}</span>
+                </div>
+                <div class="text-lg sm:text-xl font-bold text-indigo-700 tracking-wider my-1.5 font-mono">
+                  ${item.pinyin}
+                </div>
+
+                <!-- 放大版可手写田字格画板区（双字） -->
+                <div class="flex items-center gap-3.5 my-1.5 select-none">
+                  ${[0, 1].map(boxIdx => {
+                    const canvasKey = `${item.id}_${boxIdx}`;
+                    return `
+                      <div class="flex flex-col items-center gap-1.5">
+                        <div class="tianzige w-28 h-28 sm:w-32 sm:h-32 rounded-xl overflow-hidden shadow-xs relative">
+                          <canvas id="hw_${canvasKey}" data-key="${canvasKey}" class="w-full h-full cursor-crosshair block touch-none"></canvas>
+                        </div>
+                        <div class="flex items-center gap-1.5 text-[11px]">
+                          <button type="button" onclick="undoPart1Stroke('${canvasKey}')"
+                            class="px-2.5 py-1 rounded-lg bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium transition">
+                            撤销一笔
+                          </button>
+                          <button type="button" onclick="clearPart1Canvas('${canvasKey}')"
+                            class="px-2.5 py-1 rounded-lg bg-rose-100 hover:bg-rose-200 text-rose-700 font-medium transition">
+                            重写
+                          </button>
+                        </div>
+                      </div>
+                    `;
+                  }).join("")}
+                </div>
+
+                <!-- 文本确认输入框（用于系统自动批改判分） -->
+                <div class="w-full mt-2.5">
+                  <input type="text" maxlength="4" value="${val}"
+                    oninput="updatePart1('${item.id}', this.value)"
+                    placeholder="手写后请在此输入确认词语"
+                    class="w-full text-center px-3 py-2 rounded-xl border border-slate-300 bg-white text-sm font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                </div>
+              </div>
+            `;
+          }).join("")}
+        </div>
+      `;
+    }
+
+    function setPenWidth(w) {
+      state.penWidth = w;
+      renderAll();
+    }
+
+    function initPart1HandwritingCanvases() {
+      const canvases = document.querySelectorAll("canvas[id^='hw_']");
+      canvases.forEach(canvas => {
+        const key = canvas.dataset.key;
+        const rect = canvas.getBoundingClientRect();
+        const cssWidth = rect.width || 112;
+        const cssHeight = rect.height || 112;
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+        canvas.width = Math.round(cssWidth * dpr);
+        canvas.height = Math.round(cssHeight * dpr);
+
+        const ctx = canvas.getContext("2d");
+        ctx.scale(dpr, dpr);
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+        ctx.strokeStyle = "#1e293b";
+        ctx.lineWidth = state.penWidth;
+
+        // 恢复已保存的笔迹（按归一化比例 0~1 存储，缩放不失真）
+        redrawPart1Canvas(canvas, key);
+
+        let activePointerId = null;
+        let currentStroke = [];
+
+        const getNormPos = (e) => {
+          const r = canvas.getBoundingClientRect();
+          const x = Math.max(0, Math.min(r.width, e.clientX - r.left));
+          const y = Math.max(0, Math.min(r.height, e.clientY - r.top));
+          return {
+            x,
+            y,
+            nx: r.width > 0 ? x / r.width : 0,
+            ny: r.height > 0 ? y / r.height : 0
+          };
+        };
+
+        const handlePointerDown = (e) => {
+          // 仅响应主按键或触控/手写笔，防止多指误触乱飞
+          if (e.button !== 0 && e.pointerType === "mouse") return;
+          if (activePointerId !== null) return;
+          e.preventDefault();
+
+          activePointerId = e.pointerId;
+          try {
+            canvas.setPointerCapture(e.pointerId);
+          } catch (err) {}
+
+          const pos = getNormPos(e);
+          currentStroke = [{ nx: pos.nx, ny: pos.ny }];
+
+          ctx.lineWidth = state.penWidth;
+          ctx.beginPath();
+          ctx.moveTo(pos.x, pos.y);
+          ctx.lineTo(pos.x + 0.1, pos.y + 0.1);
+          ctx.stroke();
+        };
+
+        const handlePointerMove = (e) => {
+          if (e.pointerId !== activePointerId) return;
+          e.preventDefault();
+
+          const pos = getNormPos(e);
+          const last = currentStroke[currentStroke.length - 1];
+          const r = canvas.getBoundingClientRect();
+          const lastX = last.nx * r.width;
+          const lastY = last.ny * r.height;
+
+          // 过滤微小抖动（小于 1.2px 的噪声点忽略）
+          const dist = Math.hypot(pos.x - lastX, pos.y - lastY);
+          if (dist < 1.2) return;
+
+          currentStroke.push({ nx: pos.nx, ny: pos.ny });
+
+          // 重绘当前画布以应用二次贝塞尔曲线平滑插值，避免折线棱角
+          redrawPart1Canvas(canvas, key, currentStroke);
+        };
+
+        const finishStroke = (e) => {
+          if (e.pointerId !== activePointerId) return;
+          activePointerId = null;
+          try {
+            if (canvas.hasPointerCapture(e.pointerId)) {
+              canvas.releasePointerCapture(e.pointerId);
+            }
+          } catch (err) {}
+
+          if (currentStroke.length > 0) {
+            if (!state.answers.part1Strokes[key]) {
+              state.answers.part1Strokes[key] = [];
+            }
+            state.answers.part1Strokes[key].push({
+              width: state.penWidth,
+              points: currentStroke
+            });
+            currentStroke = [];
+            redrawPart1Canvas(canvas, key);
+          }
+        };
+
+        canvas.addEventListener("pointerdown", handlePointerDown);
+        canvas.addEventListener("pointermove", handlePointerMove);
+        canvas.addEventListener("pointerup", finishStroke);
+        canvas.addEventListener("pointercancel", finishStroke);
+      });
+    }
+
+    function drawSmoothStroke(ctx, points, w, h, lineWidth) {
+      if (!points || points.length === 0) return;
+      ctx.lineWidth = lineWidth || state.penWidth;
+      ctx.beginPath();
+      const p0x = points[0].nx * w;
+      const p0y = points[0].ny * h;
+      ctx.moveTo(p0x, p0y);
+
+      if (points.length === 1) {
+        ctx.lineTo(p0x + 0.1, p0y + 0.1);
+      } else if (points.length === 2) {
+        ctx.lineTo(points[1].nx * w, points[1].ny * h);
+      } else {
+        for (let i = 1; i < points.length - 1; i++) {
+          const xc = ((points[i].nx + points[i + 1].nx) * 0.5) * w;
+          const yc = ((points[i].ny + points[i + 1].ny) * 0.5) * h;
+          ctx.quadraticCurveTo(points[i].nx * w, points[i].ny * h, xc, yc);
+        }
+        const last = points[points.length - 1];
+        ctx.lineTo(last.nx * w, last.ny * h);
+      }
+      ctx.stroke();
+    }
+
+    function redrawPart1Canvas(canvas, key, livePoints = null) {
+      if (!canvas) return;
+      const rect = canvas.getBoundingClientRect();
+      const w = rect.width || 112;
+      const h = rect.height || 112;
+      const ctx = canvas.getContext("2d");
+
+      ctx.save();
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.restore();
+
+      const strokes = state.answers.part1Strokes[key] || [];
+      strokes.forEach(s => {
+        const pts = Array.isArray(s) ? s : s.points;
+        const lw = Array.isArray(s) ? state.penWidth : s.width;
+        drawSmoothStroke(ctx, pts, w, h, lw);
+      });
+
+      if (livePoints && livePoints.length > 0) {
+        drawSmoothStroke(ctx, livePoints, w, h, state.penWidth);
+      }
+    }
+
+    function undoPart1Stroke(key) {
+      const strokes = state.answers.part1Strokes[key];
+      if (strokes && strokes.length > 0) {
+        strokes.pop();
+        const canvas = document.getElementById(`hw_${key}`);
+        redrawPart1Canvas(canvas, key);
+      }
+    }
+
+    function clearPart1Canvas(key) {
+      state.answers.part1Strokes[key] = [];
+      const canvas = document.getElementById(`hw_${key}`);
+      redrawPart1Canvas(canvas, key);
+    }
+
+    function updatePart1(id, val) {
+      state.answers.part1[id] = val;
+      renderNavAndFooter();
+    }
+
+    // --- 第2部分：给下面的汉字，按照结构分类（16分）---
+    function renderPart2() {
+      const assignedSet = new Set([
+        ...state.answers.part2.leftRight,
+        ...state.answers.part2.topBottom,
+        ...state.answers.part2.single
+      ]);
+      const remaining = EXAM_DATA.part2.pool.filter(ch => !assignedSet.has(ch));
+
+      return `
+        <div class="mb-6">
+          <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+            待分类汉字字库（剩余 ${remaining.length} / 16 个，点击放入当前选中的结构框）：
+          </div>
+          <div class="min-h-[68px] p-3.5 rounded-2xl bg-slate-50 border-2 border-dashed border-slate-300 flex flex-wrap gap-2.5 items-center">
+            ${remaining.length === 0
+              ? `<span class="text-sm text-emerald-600 font-medium">🎉 全部 16 个汉字都已归类完成！点击下方框内汉字可退回重选。</span>`
+              : remaining.map(ch => `
+                <button onclick="assignPart2Char('${ch}')"
+                  class="w-11 h-11 rounded-xl bg-white border border-slate-300 shadow-xs hover:border-indigo-500 hover:bg-indigo-50 text-xl font-bold text-slate-800 kaiti-text transition transform active:scale-95">
+                  ${ch}
+                </button>
+              `).join("")
+            }
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          ${EXAM_DATA.part2.categories.map(cat => {
+            const isSelected = state.activePart2Box === cat.key;
+            const list = state.answers.part2[cat.key] || [];
+            return `
+              <div onclick="setActivePart2Box('${cat.key}')"
+                class="cursor-pointer rounded-2xl p-4 border-2 transition ${
+                  isSelected
+                    ? "border-indigo-600 bg-indigo-50/40 shadow-sm"
+                    : "border-slate-200 bg-white hover:border-slate-300"
+                }">
+                <div class="flex items-center justify-between mb-3">
+                  <span class="font-bold text-base text-slate-800 flex items-center gap-1.5">
+                    ${isSelected ? '<span class="w-2.5 h-2.5 rounded-full bg-indigo-600 inline-block"></span>' : ''}
+                    ${cat.label}
+                  </span>
+                  <span class="text-xs font-semibold px-2 py-0.5 rounded-full ${
+                    list.length === cat.expectedCount ? "bg-emerald-100 text-emerald-700" : "bg-slate-100 text-slate-600"
+                  }">
+                    ${list.length} / ${cat.expectedCount} 字
+                  </span>
+                </div>
+                <div class="min-h-[110px] p-2.5 rounded-xl bg-white border border-slate-200 flex flex-wrap gap-2 content-start">
+                  ${list.length === 0
+                    ? `<span class="text-xs text-slate-400 m-auto">点击此处选中此框，再点上方汉字填入</span>`
+                    : list.map(ch => `
+                      <button onclick="event.stopPropagation(); removePart2Char('${cat.key}', '${ch}')"
+                        title="点击退回字库"
+                        class="w-10 h-10 rounded-lg bg-indigo-100 text-indigo-900 hover:bg-rose-100 hover:text-rose-700 font-bold text-lg kaiti-text transition flex items-center justify-center">
+                        ${ch}
+                      </button>
+                    `).join("")
+                  }
+                </div>
+              </div>
+            `;
+          }).join("")}
+        </div>
+      `;
+    }
+
+    function setActivePart2Box(key) {
+      state.activePart2Box = key;
+      renderAll();
+    }
+
+    function assignPart2Char(ch) {
+      const box = state.activePart2Box;
+      const cat = EXAM_DATA.part2.categories.find(c => c.key === box);
+      if (!cat) return;
+      if (state.answers.part2[box].length >= cat.expectedCount) {
+        showToast(`【${cat.label}】已填满 ${cat.expectedCount} 个字，可点击已填汉字退回或切换其他框。`, "warn");
+        return;
+      }
+      state.answers.part2[box].push(ch);
+      renderAll();
+    }
+
+    function removePart2Char(box, ch) {
+      state.answers.part2[box] = state.answers.part2[box].filter(item => item !== ch);
+      state.activePart2Box = box;
+      renderAll();
+    }
+
+    // --- 第3部分：连一连，组词语，写在横线上（10分）---
+    function renderPart3() {
+      const matchedRightIds = new Set(Object.values(state.answers.part3));
+      return `
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+          <!-- 左侧：点击配对区 -->
+          <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200">
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-sm font-bold text-slate-700">第一步：点击左边生字，再点右边词语配对</span>
+              <button onclick="resetPart3()" class="text-xs text-rose-600 hover:underline font-medium">清空重连</button>
+            </div>
+            <div class="grid grid-cols-2 gap-6">
+              <!-- 左列 -->
+              <div class="space-y-3">
+                ${EXAM_DATA.part3.leftItems.map((lItem, i) => {
+                  const isSelected = state.activePart3Left === lItem.id;
+                  const pairedRId = state.answers.part3[lItem.id];
+                  const pairedR = EXAM_DATA.part3.rightItems.find(r => r.id === pairedRId);
+                  return `
+                    <button onclick="selectPart3Left('${lItem.id}')"
+                      class="w-full py-3 px-4 rounded-xl border-2 font-bold text-lg flex items-center justify-between transition ${
+                        isSelected
+                          ? "border-indigo-600 bg-indigo-600 text-white shadow-sm"
+                          : pairedR
+                            ? "border-emerald-400 bg-emerald-50 text-emerald-900"
+                            : "border-slate-200 bg-white text-slate-800 hover:border-indigo-300"
+                      }">
+                      <span class="text-xs opacity-70">${i + 1}.</span>
+                      <span class="kaiti-text text-xl">${lItem.char}</span>
+                      <span class="text-xs">${pairedR ? "→ " + pairedR.text : "○"}</span>
+                    </button>
+                  `;
+                }).join("")}
+              </div>
+
+              <!-- 右列 -->
+              <div class="space-y-3">
+                ${EXAM_DATA.part3.rightItems.map(rItem => {
+                  const isUsed = matchedRightIds.has(rItem.id);
+                  return `
+                    <button onclick="selectPart3Right('${rItem.id}')"
+                      class="w-full py-3 px-4 rounded-xl border-2 font-bold text-lg flex items-center justify-between transition ${
+                        isUsed
+                          ? "border-emerald-300 bg-emerald-50/70 text-emerald-700"
+                          : state.activePart3Left
+                            ? "border-amber-300 bg-amber-50/50 text-slate-800 hover:border-indigo-500 hover:bg-indigo-50"
+                            : "border-slate-200 bg-white text-slate-800"
+                      }">
+                      <span class="text-xs">${isUsed ? "✓" : "○"}</span>
+                      <span class="kaiti-text text-xl">${rItem.text}</span>
+                      <span class="w-3"></span>
+                    </button>
+                  `;
+                }).join("")}
+              </div>
+            </div>
+          </div>
+
+          <!-- 右侧：横线词语预览区 -->
+          <div class="bg-amber-50/50 rounded-2xl p-5 border border-amber-200/80">
+            <div class="text-sm font-bold text-amber-900 mb-3">第二步：组好的词语（自动写在横线上）</div>
+            <div class="space-y-3.5">
+              ${EXAM_DATA.part3.leftItems.map((lItem, i) => {
+                const pairedRId = state.answers.part3[lItem.id];
+                const pairedR = EXAM_DATA.part3.rightItems.find(r => r.id === pairedRId);
+                const combined = pairedR ? `${lItem.char}${pairedR.text}` : "";
+                return `
+                  <div class="flex items-center gap-3">
+                    <span class="text-sm font-bold text-slate-500 w-6">${i + 1}.</span>
+                    <div class="flex-1 border-b-2 border-slate-400 pb-1 px-3 min-h-[34px] flex items-center justify-between bg-white/80 rounded-t-lg">
+                      <span class="text-lg font-bold tracking-widest kaiti-text ${combined ? "text-indigo-700" : "text-slate-300"}">
+                        ${combined || "请先在左侧点击连线"}
+                      </span>
+                      ${combined ? `
+                        <button onclick="unpairPart3('${lItem.id}')" class="text-xs text-slate-400 hover:text-rose-600">取消</button>
+                      ` : ""}
+                    </div>
+                  </div>
+                `;
+              }).join("")}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function selectPart3Left(leftId) {
+      state.activePart3Left = (state.activePart3Left === leftId) ? null : leftId;
+      renderAll();
+    }
+
+    function selectPart3Right(rightId) {
+      if (!state.activePart3Left) {
+        showToast("请先点击左边的单字，再点击右边的词语进行配对！", "warn");
+        return;
+      }
+      // 如果该右侧词语已被其他左侧字占用，先解除原占用
+      Object.keys(state.answers.part3).forEach(k => {
+        if (state.answers.part3[k] === rightId) delete state.answers.part3[k];
+      });
+      state.answers.part3[state.activePart3Left] = rightId;
+      state.activePart3Left = null;
+      renderAll();
+    }
+
+    function unpairPart3(leftId) {
+      delete state.answers.part3[leftId];
+      renderAll();
+    }
+
+    function resetPart3() {
+      state.answers.part3 = {};
+      state.activePart3Left = null;
+      renderAll();
+    }
+
+    // --- 第4部分：根据提示找出部首相同的字（16分）---
+    function renderPart4() {
+      const usedSet = new Set([
+        ...state.answers.part4.xin,
+        ...state.answers.part4.shi,
+        ...state.answers.part4.fei,
+        ...state.answers.part4.dou
+      ]);
+      const available = EXAM_DATA.part4.pool.filter(ch => !usedSet.has(ch));
+
+      return `
+        <!-- 云朵字库区 -->
+        <div class="mb-6 bg-sky-50/70 border-2 border-sky-200 rounded-3xl p-4 sm:p-5">
+          <div class="text-xs font-bold text-sky-800 mb-2.5 flex items-center justify-between">
+            <span>☁️ 汉字云朵字库（剩余 ${available.length} / 16 个）：</span>
+            <span class="text-slate-500 font-normal">先点选下方部首行，再点云朵中的字</span>
+          </div>
+          <div class="flex flex-wrap gap-2.5 min-h-[54px] items-center">
+            ${available.length === 0
+              ? `<span class="text-sm text-emerald-600 font-medium">✨ 云朵里的 16 个汉字已全部分类完毕！</span>`
+              : available.map(ch => `
+                <button onclick="assignPart4Char('${ch}')"
+                  class="w-11 h-11 rounded-2xl bg-white border border-sky-300 shadow-xs hover:bg-indigo-600 hover:text-white hover:border-indigo-600 text-xl font-bold kaiti-text text-slate-800 transition">
+                  ${ch}
+                </button>
+              `).join("")
+            }
+          </div>
+        </div>
+
+        <!-- 四行部首填空 -->
+        <div class="space-y-3.5">
+          ${EXAM_DATA.part4.groups.map(grp => {
+            const isActive = state.activePart4Group === grp.key;
+            const chars = state.answers.part4[grp.key] || [];
+            return `
+              <div onclick="setActivePart4Group('${grp.key}')"
+                class="cursor-pointer p-4 rounded-2xl border-2 transition flex flex-col sm:flex-row sm:items-center gap-3 ${
+                  isActive ? "border-indigo-600 bg-indigo-50/40" : "border-slate-200 bg-white hover:border-slate-300"
+                }">
+                <div class="sm:w-44 font-bold text-slate-800 flex items-center gap-2">
+                  <span class="w-3 h-3 rounded-full ${isActive ? "bg-indigo-600" : "bg-slate-300"}"></span>
+                  <span>${grp.radical}：</span>
+                </div>
+                <div class="flex-1 grid grid-cols-4 gap-2.5">
+                  ${[0, 1, 2, 3].map(slotIdx => {
+                    const ch = chars[slotIdx];
+                    return ch
+                      ? `<button onclick="event.stopPropagation(); removePart4Char('${grp.key}', '${ch}')"
+                          title="点击退回云朵字库"
+                          class="h-11 rounded-xl bg-indigo-100 text-indigo-900 hover:bg-rose-100 hover:text-rose-700 font-bold text-xl kaiti-text border border-indigo-200 transition">
+                          ${ch}
+                        </button>`
+                      : `<div class="h-11 rounded-xl border-2 border-dashed border-slate-300 bg-slate-50/70 flex items-center justify-center text-xs text-slate-400">
+                          第${slotIdx + 1}字
+                        </div>`;
+                  }).join("")}
+                </div>
+              </div>
+            `;
+          }).join("")}
+        </div>
+      `;
+    }
+
+    function setActivePart4Group(key) {
+      state.activePart4Group = key;
+      renderAll();
+    }
+
+    function assignPart4Char(ch) {
+      const grp = state.activePart4Group;
+      if (state.answers.part4[grp].length >= 4) {
+        showToast("该部首行已填满 4 个字，请点击其他部首行或退回已填汉字。", "warn");
+        return;
+      }
+      state.answers.part4[grp].push(ch);
+      renderAll();
+    }
+
+    function removePart4Char(grp, ch) {
+      state.answers.part4[grp] = state.answers.part4[grp].filter(item => item !== ch);
+      state.activePart4Group = grp;
+      renderAll();
+    }
+
+    // --- 第5部分：选择正确的答案填空（6分）---
+    function renderPart5() {
+      return `
+        <div class="space-y-4">
+          ${EXAM_DATA.part5.map((q, idx) => {
+            const selected = state.answers.part5[q.id];
+            return `
+              <div class="p-4 rounded-2xl border border-slate-200 bg-slate-50/60">
+                <div class="font-bold text-slate-800 text-base mb-3">
+                  ${idx + 1}. ${q.question}
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                  ${q.options.map(opt => {
+                    const isPicked = selected === opt.label;
+                    return `
+                      <button onclick="selectPart5('${q.id}', '${opt.label}')"
+                        class="text-left px-4 py-2.5 rounded-xl border-2 font-medium text-sm transition flex items-center gap-2.5 ${
+                          isPicked
+                            ? "border-indigo-600 bg-indigo-600 text-white shadow-xs"
+                            : "border-slate-200 bg-white text-slate-700 hover:border-indigo-300"
+                        }">
+                        <span class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+                          isPicked ? "bg-white text-indigo-700" : "bg-slate-100 text-slate-600"
+                        }">${opt.label}</span>
+                        <span>${opt.text}</span>
+                      </button>
+                    `;
+                  }).join("")}
+                </div>
+              </div>
+            `;
+          }).join("")}
+        </div>
+      `;
+    }
+
+    function selectPart5(qId, label) {
+      state.answers.part5[qId] = label;
+      renderAll();
+    }
+
+    // --- 第6部分：选词填空（10分）---
+    function renderPart6() {
+      const usedWords = new Set(Object.values(state.answers.part6));
+      return `
+        <!-- 备选词语库 -->
+        <div class="mb-6 p-4 rounded-2xl bg-indigo-50/70 border border-indigo-200">
+          <div class="text-xs font-bold text-indigo-800 mb-2.5">备选词语库（点击词语填入当前选中的句子括号中）：</div>
+          <div class="flex flex-wrap gap-2.5">
+            ${EXAM_DATA.part6.wordBank.map(word => {
+              const isUsed = usedWords.has(word);
+              return `
+                <button onclick="fillPart6Word('${word}')"
+                  class="px-4 py-2 rounded-xl font-bold text-base border-2 transition ${
+                    isUsed
+                      ? "border-slate-200 bg-slate-100 text-slate-400 line-through"
+                      : "border-indigo-400 bg-white text-indigo-800 hover:bg-indigo-600 hover:text-white shadow-xs"
+                  }">
+                  ${word}
+                </button>
+              `;
+            }).join("")}
+          </div>
+        </div>
+
+        <!-- 五道填空句 -->
+        <div class="space-y-3.5">
+          ${EXAM_DATA.part6.items.map(item => {
+            const isActive = state.activePart6Blank === item.id;
+            const val = state.answers.part6[item.id] || "";
+            return `
+              <div onclick="setActivePart6Blank('${item.id}')"
+                class="cursor-pointer p-4 rounded-2xl border-2 transition text-base sm:text-lg leading-relaxed ${
+                  isActive ? "border-indigo-600 bg-indigo-50/30" : "border-slate-200 bg-white hover:border-slate-300"
+                }">
+                <span>${item.prefix}</span>
+                <span class="inline-flex items-center justify-center min-w-[84px] px-3 py-0.5 mx-1 rounded-lg border-b-2 font-bold ${
+                  val
+                    ? "bg-indigo-100 text-indigo-800 border-indigo-600"
+                    : isActive
+                      ? "bg-amber-100 text-amber-700 border-amber-500 animate-pulse"
+                      : "bg-slate-100 text-slate-400 border-slate-400"
+                }">
+                  ${val || "点击选词"}
+                </span>
+                <span>${item.suffix}</span>
+                ${val ? `
+                  <button onclick="event.stopPropagation(); clearPart6Blank('${item.id}')"
+                    class="ml-2 text-xs text-rose-500 hover:underline font-normal">清除</button>
+                ` : ""}
+              </div>
+            `;
+          }).join("")}
+        </div>
+      `;
+    }
+
+    function setActivePart6Blank(id) {
+      state.activePart6Blank = id;
+      renderAll();
+    }
+
+    function fillPart6Word(word) {
+      const targetId = state.activePart6Blank;
+      // 若该词已被其他空占用，先清除原空
+      Object.keys(state.answers.part6).forEach(k => {
+        if (state.answers.part6[k] === word) delete state.answers.part6[k];
+      });
+      state.answers.part6[targetId] = word;
+
+      // 自动跳到下一个未填的空
+      const nextEmpty = EXAM_DATA.part6.items.find(it => !state.answers.part6[it.id]);
+      if (nextEmpty) state.activePart6Blank = nextEmpty.id;
+      renderAll();
+    }
+
+    function clearPart6Blank(id) {
+      delete state.answers.part6[id];
+      state.activePart6Blank = id;
+      renderAll();
+    }
+
+    // --- 第7部分：连词成句（10分）---
+    function renderPart7() {
+      return `
+        <div class="space-y-5">
+          ${EXAM_DATA.part7.map((q, idx) => {
+            const chosenIndices = state.answers.part7[q.id] || [];
+            const builtSentence = buildPart7Sentence(q, chosenIndices);
+            return `
+              <div class="p-4 sm:p-5 rounded-2xl border border-slate-200 bg-slate-50/70">
+                <div class="flex items-center justify-between mb-3">
+                  <span class="font-bold text-slate-700 text-sm">第 ${idx + 1} 题（2分） · 请按顺序点击下列词块：</span>
+                  <button onclick="resetPart7('${q.id}')" class="text-xs text-rose-600 hover:underline font-medium">清空重排</button>
+                </div>
+
+                <!-- 词块按钮 -->
+                <div class="flex flex-wrap gap-2 mb-3.5">
+                  ${q.tokens.map((tok, tIdx) => {
+                    const isUsed = chosenIndices.includes(tIdx);
+                    return `
+                      <button onclick="togglePart7Token('${q.id}', ${tIdx})"
+                        class="px-3.5 py-2 rounded-xl border-2 font-bold text-base transition ${
+                          isUsed
+                            ? "border-slate-200 bg-slate-200/70 text-slate-400"
+                            : "border-blue-300 bg-white text-slate-800 hover:border-indigo-600 hover:bg-indigo-50 shadow-xs"
+                        }">
+                        ${tok}
+                      </button>
+                    `;
+                  }).join("")}
+                </div>
+
+                <!-- 组句结果预览 -->
+                <div class="p-3 rounded-xl bg-white border border-slate-300 min-h-[46px] flex items-center justify-between">
+                  <span class="text-base sm:text-lg font-bold tracking-wide ${builtSentence ? "text-indigo-800" : "text-slate-400 text-sm font-normal"}">
+                    ${builtSentence || "点击上方词块，这里会自动连成完整句子……"}
+                  </span>
+                  ${chosenIndices.length > 0 ? `
+                    <button onclick="popPart7Token('${q.id}')" class="text-xs px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600">
+                      退回一词
+                    </button>
+                  ` : ""}
+                </div>
+              </div>
+            `;
+          }).join("")}
+        </div>
+      `;
+    }
+
+    function buildPart7Sentence(q, chosenIndices) {
+      if (!chosenIndices || chosenIndices.length === 0) return "";
+      const words = chosenIndices.map(i => q.tokens[i]);
+      let raw = words.join("");
+      // 针对第2题“他们有的做游戏，有的爬树。”自动补充逗号
+      if (q.id === "p7_2" && chosenIndices.length === q.tokens.length) {
+        raw = raw.replace(/(做游戏|爬树)(有的)/, "$1，$2");
+      }
+      if (chosenIndices.length === q.tokens.length && !raw.endsWith("。")) {
+        raw += "。";
+      }
+      return raw;
+    }
+
+    function togglePart7Token(qId, tIdx) {
+      const arr = state.answers.part7[qId] || [];
+      if (arr.includes(tIdx)) {
+        state.answers.part7[qId] = arr.filter(i => i !== tIdx);
+      } else {
+        state.answers.part7[qId] = [...arr, tIdx];
+      }
+      renderAll();
+    }
+
+    function popPart7Token(qId) {
+      const arr = state.answers.part7[qId] || [];
+      state.answers.part7[qId] = arr.slice(0, -1);
+      renderAll();
+    }
+
+    function resetPart7(qId) {
+      state.answers.part7[qId] = [];
+      renderAll();
+    }
+
+    // --- 第8部分：读一读，组词语（10分）---
+    function renderPart8() {
+      return `
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          ${EXAM_DATA.part8.map((q, idx) => {
+            const val = state.answers.part8[q.id] || "";
+            return `
+              <div class="p-4 rounded-2xl border border-slate-200 bg-slate-50/70 flex items-center gap-4">
+                <div class="w-14 h-14 rounded-2xl bg-amber-100 border-2 border-amber-300 flex items-center justify-center text-2xl font-bold kaiti-text text-amber-900 shrink-0">
+                  ${q.char}
+                </div>
+                <div class="flex-1">
+                  <div class="text-xs text-slate-400 mb-1">第 ${idx + 1} 题（2分）</div>
+                  <input type="text" maxlength="6" value="${val}"
+                    oninput="updatePart8('${q.id}', this.value)"
+                    placeholder="用“${q.char}”组一个词语"
+                    class="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white font-bold text-slate-800 text-base focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                </div>
+              </div>
+            `;
+          }).join("")}
+        </div>
+      `;
+    }
+
+    function updatePart8(qId, val) {
+      state.answers.part8[qId] = val;
+      renderNavAndFooter();
+    }
+
+    // --- 第9部分：阅读短文，完成练习（10分）---
+    function renderPart9() {
+      return `
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <!-- 左侧短文阅读区 -->
+          <div class="lg:col-span-6 bg-amber-50/60 border border-amber-200 rounded-2xl p-5 sm:p-6">
+            <h3 class="text-center text-xl font-bold text-slate-900 mb-4 tracking-wider">
+              ${EXAM_DATA.part9.title}
+            </h3>
+            <div class="space-y-4 text-base sm:text-lg leading-loose text-slate-800 indent-8">
+              ${EXAM_DATA.part9.paragraphs.map(p => `<p>${p}</p>`).join("")}
+            </div>
+          </div>
+
+          <!-- 右侧阅读理解题目区 -->
+          <div class="lg:col-span-6 space-y-4">
+            ${EXAM_DATA.part9.questions.map(q => {
+              const val = state.answers.part9[q.id] || "";
+              if (q.type === "radio") {
+                return `
+                  <div class="p-4 rounded-2xl border border-slate-200 bg-slate-50/70">
+                    <div class="font-bold text-slate-800 text-sm sm:text-base mb-2.5">${q.prompt}</div>
+                    <div class="space-y-2">
+                      ${q.options.map(opt => {
+                        const isPicked = val === opt.label;
+                        return `
+                          <button onclick="updatePart9('${q.id}', '${opt.label}')"
+                            class="w-full text-left px-3.5 py-2 rounded-xl border-2 text-sm font-medium transition flex items-center gap-2 ${
+                              isPicked
+                                ? "border-indigo-600 bg-indigo-600 text-white"
+                                : "border-slate-200 bg-white text-slate-700 hover:border-indigo-300"
+                            }">
+                            <span class="font-bold">${opt.label}.</span>
+                            <span>${opt.text}</span>
+                          </button>
+                        `;
+                      }).join("")}
+                    </div>
+                  </div>
+                `;
+              } else {
+                return `
+                  <div class="p-4 rounded-2xl border border-slate-200 bg-slate-50/70">
+                    <div class="font-bold text-slate-800 text-sm sm:text-base mb-2">
+                      ${q.prompt}${q.suffix ? `<span class="text-indigo-700">______</span>${q.suffix}` : ""}
+                    </div>
+                    <input type="text" value="${val}"
+                      oninput="updatePart9('${q.id}', this.value)"
+                      placeholder="请根据短文内容填写答案"
+                      class="w-full px-3.5 py-2 rounded-xl border border-slate-300 bg-white text-sm font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                  </div>
+                `;
+              }
+            }).join("")}
+          </div>
+        </div>
+      `;
+    }
+
+    function updatePart9(qId, val) {
+      state.answers.part9[qId] = val;
+      if (qId === "p9_3" || qId === "p9_4") {
+        renderAll();
+      } else {
+        renderNavAndFooter();
+      }
+    }
+
+    /*************************************************************************
+     * 六、 交卷确认与全卷自动批改引擎（满分 100 分）
+     *************************************************************************/
+    function openConfirmModal() {
+      const incompleteCount = EXAM_DATA.sections.filter(s => !isSectionCompleted(s.id)).length;
+      const summaryEl = document.getElementById("confirmSummary");
+      if (incompleteCount > 0) {
+        summaryEl.innerHTML = `你还有 <span class="font-bold text-rose-600">${incompleteCount}</span> 个部分尚未全部填完。现在交卷系统将自动批改，未填题目会收入【错题本】方便练习，确定要交卷吗？`;
+      } else {
+        summaryEl.innerHTML = `太棒了！你已经完成了全部 9 个部分的作答。现在提交，系统将立即计算总分（满分 100 分）并生成专属错题本。`;
+      }
+      document.getElementById("confirmModal").classList.remove("hidden");
+    }
+
+    function closeConfirmModal() {
+      document.getElementById("confirmModal").classList.add("hidden");
+    }
+
+    function normalizeText(str) {
+      return (str || "").trim().replace(/\s+/g, "").replace(/[，。！？、,.!?]/g, "");
+    }
+
+    function submitExam() {
+      closeConfirmModal();
+      const a = state.answers;
+      const wrongItems = [];
+      const breakdown = [];
+      let totalScore = 0;
+
+      // 1. 批改第一部分（12分，每题2分）
+      let s1 = 0;
+      EXAM_DATA.part1.forEach((q, idx) => {
+        const userAns = (a.part1[q.id] || "").trim();
+        const isCorrect = userAns === q.answer;
+        if (isCorrect) {
+          s1 += 2;
+        } else {
+          wrongItems.push({
+            uid: `p1_${q.id}`,
+            section: "一、看拼音，写词语",
+            questionText: `第 ${idx + 1} 题：看拼音【${q.pinyin}】写词语（${q.hint}）`,
+            userAnswer: userAns || "（未作答）",
+            correctAnswer: q.answer,
+            acceptedList: [q.answer],
+            explain: `拼音“${q.pinyin}”对应的课本重点词语是“${q.answer}”。`,
+            fixed: false
+          });
+        }
+      });
+      breakdown.push({ name: "一、看拼音，写词语", score: s1, full: 12 });
+      totalScore += s1;
+
+      // 2. 批改第二部分（16分，每字1分）
+      let s2 = 0;
+      EXAM_DATA.part2.categories.forEach(cat => {
+        const userChars = a.part2[cat.key] || [];
+        const rightOnes = userChars.filter(ch => cat.answers.includes(ch));
+        s2 += rightOnes.length;
+        if (rightOnes.length < cat.expectedCount || userChars.length !== rightOnes.length) {
+          wrongItems.push({
+            uid: `p2_${cat.key}`,
+            section: "二、汉字结构分类",
+            questionText: `找出属于【${cat.label}】的汉字（共 ${cat.expectedCount} 个）`,
+            userAnswer: userChars.length > 0 ? userChars.join("、") : "（未作答）",
+            correctAnswer: cat.answers.join("、"),
+            acceptedList: [cat.answers.join("")],
+            explain: cat.explain,
+            fixed: false
+          });
+        }
+      });
+      breakdown.push({ name: "二、汉字结构分类", score: s2, full: 16 });
+      totalScore += s2;
+
+      // 3. 批改第三部分（10分，每组2分）
+      let s3 = 0;
+      EXAM_DATA.part3.leftItems.forEach((lItem, idx) => {
+        const pickedRId = a.part3[lItem.id];
+        const pairedR = EXAM_DATA.part3.rightItems.find(r => r.id === pickedRId);
+        const userWord = pairedR ? `${lItem.char}${pairedR.text}` : "";
+        if (pickedRId === lItem.matchRightId) {
+          s3 += 2;
+        } else {
+          wrongItems.push({
+            uid: `p3_${lItem.id}`,
+            section: "三、连一连，组词语",
+            questionText: `第 ${idx + 1} 组：为生字“${lItem.char}”连线组成课本词语`,
+            userAnswer: userWord || "（未连线）",
+            correctAnswer: lItem.word,
+            acceptedList: [lItem.word],
+            explain: `“${lItem.char}”与右侧词语搭配组成“${lItem.word}”。`,
+            fixed: false
+          });
+        }
+      });
+      breakdown.push({ name: "三、连一连，组词语", score: s3, full: 10 });
+      totalScore += s3;
+
+      // 4. 批改第四部分（16分，每字1分）
+      let s4 = 0;
+      EXAM_DATA.part4.groups.forEach(grp => {
+        const userChars = a.part4[grp.key] || [];
+        const rightOnes = userChars.filter(ch => grp.answers.includes(ch));
+        s4 += rightOnes.length;
+        if (rightOnes.length < 4) {
+          wrongItems.push({
+            uid: `p4_${grp.key}`,
+            section: "四、找部首相同的字",
+            questionText: `从云朵字库中找出部首为【${grp.radical}】的 4 个字`,
+            userAnswer: userChars.length > 0 ? userChars.join("、") : "（未作答）",
+            correctAnswer: grp.answers.join("、"),
+            acceptedList: [grp.answers.join("")],
+            explain: grp.explain,
+            fixed: false
+          });
+        }
+      });
+      breakdown.push({ name: "四、找部首相同的字", score: s4, full: 16 });
+      totalScore += s4;
+
+      // 5. 批改第五部分（6分，每题1分）
+      let s5 = 0;
+      EXAM_DATA.part5.forEach((q, idx) => {
+        const picked = a.part5[q.id];
+        if (picked === q.answer) {
+          s5 += 1;
+        } else {
+          const pickedOpt = q.options.find(o => o.label === picked);
+          const rightOpt = q.options.find(o => o.label === q.answer);
+          wrongItems.push({
+            uid: `p5_${q.id}`,
+            section: "五、单项选择",
+            questionText: `第 ${idx + 1} 题：${q.question}`,
+            userAnswer: pickedOpt ? `${pickedOpt.label}. ${pickedOpt.text}` : "（未选择）",
+            correctAnswer: `${rightOpt.label}. ${rightOpt.text}`,
+            acceptedList: [q.answer, rightOpt.text],
+            explain: q.explain,
+            fixed: false
+          });
+        }
+      });
+      breakdown.push({ name: "五、选择正确的答案填空", score: s5, full: 6 });
+      totalScore += s5;
+
+      // 6. 批改第六部分（10分，每空2分）
+      let s6 = 0;
+      EXAM_DATA.part6.items.forEach(item => {
+        const userWord = a.part6[item.id] || "";
+        if (userWord === item.answer) {
+          s6 += 2;
+        } else {
+          wrongItems.push({
+            uid: `p6_${item.id}`,
+            section: "六、选词填空",
+            questionText: `${item.prefix} ______ ${item.suffix}`,
+            userAnswer: userWord || "（未填词）",
+            correctAnswer: item.answer,
+            acceptedList: [item.answer],
+            explain: item.explain,
+            fixed: false
+          });
+        }
+      });
+      breakdown.push({ name: "六、选词填空", score: s6, full: 10 });
+      totalScore += s6;
+
+      // 7. 批改第七部分（10分，每题2分）
+      let s7 = 0;
+      EXAM_DATA.part7.forEach((q, idx) => {
+        const chosen = a.part7[q.id] || [];
+        const userSentence = buildPart7Sentence(q, chosen);
+        const normUser = normalizeText(userSentence);
+        const validNorms = [q.answer, ...(q.altAnswers || [])].map(normalizeText);
+        if (chosen.length === q.tokens.length && validNorms.includes(normUser)) {
+          s7 += 2;
+        } else {
+          wrongItems.push({
+            uid: `p7_${q.id}`,
+            section: "七、连词成句",
+            questionText: `第 ${idx + 1} 题：用【${q.tokens.join(" / ")}】连成通顺的句子`,
+            userAnswer: userSentence || "（未连句）",
+            correctAnswer: q.answer,
+            acceptedList: [q.answer, ...(q.altAnswers || [])],
+            explain: q.explain,
+            fixed: false
+          });
+        }
+      });
+      breakdown.push({ name: "七、连词成句", score: s7, full: 10 });
+      totalScore += s7;
+
+      // 8. 批改第八部分（10分，每题2分）
+      let s8 = 0;
+      EXAM_DATA.part8.forEach((q, idx) => {
+        const userWord = (a.part8[q.id] || "").trim();
+        const isValid = userWord.length >= 2 && userWord.includes(q.char) && q.accepted.includes(userWord);
+        if (isValid) {
+          s8 += 2;
+        } else {
+          wrongItems.push({
+            uid: `p8_${q.id}`,
+            section: "八、读一读，组词语",
+            questionText: `第 ${idx + 1} 题：用生字【${q.char}】组一个课本常见词语`,
+            userAnswer: userWord || "（未组词）",
+            correctAnswer: q.sample,
+            acceptedList: q.accepted,
+            explain: q.explain,
+            fixed: false
+          });
+        }
+      });
+      breakdown.push({ name: "八、读一读，组词语", score: s8, full: 10 });
+      totalScore += s8;
+
+      // 9. 批改第九部分（10分，每题2分）
+      let s9 = 0;
+      EXAM_DATA.part9.questions.forEach(q => {
+        const rawUser = (a.part9[q.id] || "").trim();
+        let isCorrect = false;
+        if (q.type === "radio") {
+          isCorrect = rawUser === q.answer;
+        } else if (q.keywords) {
+          isCorrect = q.keywords.every(kw => rawUser.includes(kw));
+        } else {
+          const normU = normalizeText(rawUser);
+          const validList = [q.answer, ...(q.altAnswers || [])].map(normalizeText);
+          isCorrect = validList.includes(normU);
+        }
+
+        if (isCorrect) {
+          s9 += 2;
+        } else {
+          let displayUser = rawUser || "（未作答）";
+          let displayCorrect = q.answer;
+          if (q.type === "radio") {
+            const uOpt = q.options.find(o => o.label === rawUser);
+            const cOpt = q.options.find(o => o.label === q.answer);
+            displayUser = uOpt ? `${uOpt.label}. ${uOpt.text}` : "（未选择）";
+            displayCorrect = `${cOpt.label}. ${cOpt.text}`;
+          }
+          wrongItems.push({
+            uid: `p9_${q.id}`,
+            section: "九、阅读短文《夜晚的天空》",
+            questionText: q.prompt + (q.suffix || ""),
+            userAnswer: displayUser,
+            correctAnswer: displayCorrect,
+            acceptedList: q.type === "radio" ? [q.answer, q.options.find(o => o.label === q.answer).text] : [q.answer, ...(q.altAnswers || [])],
+            keywords: q.keywords || null,
+            explain: q.explain,
+            fixed: false
+          });
+        }
+      });
+      breakdown.push({ name: "九、阅读短文，完成练习", score: s9, full: 10 });
+      totalScore += s9;
+
+      state.isSubmitted = true;
+      state.gradingResult = {
+        totalScore,
+        breakdown,
+        submittedAt: new Date().toLocaleString("zh-CN"),
+        duration: document.getElementById("timerDisplay").textContent
+      };
+      state.wrongBook = wrongItems;
+      saveWrongBookToLocal();
+
+      showToast(`批改完成！你的总分是 ${totalScore} / 100 分！`, "success");
+      goToPage(10);
+    }
+
+    /*************************************************************************
+     * 七、 成绩单与专属错题本渲染、在线订正、本地存储与导出
+     *************************************************************************/
+    function saveWrongBookToLocal() {
+      try {
+        localStorage.setItem("g4_chinese_exam_wrongbook", JSON.stringify({
+          gradingResult: state.gradingResult,
+          wrongBook: state.wrongBook
+        }));
+      } catch (e) {}
+    }
+
+    function loadSavedWrongBook() {
+      try {
+        const raw = localStorage.getItem("g4_chinese_exam_wrongbook");
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (parsed && Array.isArray(parsed.wrongBook) && parsed.wrongBook.length > 0) {
+            state.wrongBook = parsed.wrongBook;
+            state.gradingResult = parsed.gradingResult || null;
+          }
+        }
+      } catch (e) {}
+    }
+
+    function renderResultAndWrongBookPage() {
+      const res = state.gradingResult;
+      const name = (document.getElementById("studentName")?.value || "").trim() || "同学";
+      const cls = (document.getElementById("studentClass")?.value || "").trim() || "四年级";
+
+      const totalWrong = state.wrongBook.length;
+      const fixedCount = state.wrongBook.filter(w => w.fixed).length;
+      const unfixedCount = totalWrong - fixedCount;
+
+      const filteredList = state.wrongBook.filter(item => {
+        if (state.wrongBookFilter === "unfixed") return !item.fixed;
+        if (state.wrongBookFilter === "fixed") return item.fixed;
+        return true;
+      });
+
+      let gradeBadge = { text: "继续加油 💪", color: "text-amber-600 bg-amber-50 border-amber-200" };
+      if (res) {
+        if (res.totalScore >= 90) gradeBadge = { text: "优秀 · 满分小能手 🌟", color: "text-emerald-700 bg-emerald-50 border-emerald-200" };
+        else if (res.totalScore >= 80) gradeBadge = { text: "良好 · 表现很棒 👍", color: "text-blue-700 bg-blue-50 border-blue-200" };
+        else if (res.totalScore >= 60) gradeBadge = { text: "及格 · 再巩固一下错题 📖", color: "text-indigo-700 bg-indigo-50 border-indigo-200" };
+      }
+
+      return `
+        <!-- 成绩单总览卡片 -->
+        ${res ? `
+          <div class="bg-gradient-to-br from-indigo-50 via-blue-50 to-sky-50 border border-indigo-200 rounded-2xl p-5 sm:p-6 mb-8">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-indigo-200/70 pb-5">
+              <div>
+                <span class="inline-block px-3 py-1 rounded-full text-xs font-bold border ${gradeBadge.color} mb-2">
+                  ${gradeBadge.text}
+                </span>
+                <h2 class="text-2xl font-bold text-slate-800">${cls} · ${name} 的模拟考试成绩单</h2>
+                <p class="text-xs text-slate-500 mt-1">交卷时间：${res.submittedAt} ｜ 用时：${res.duration}</p>
+              </div>
+              <div class="flex items-center gap-4 bg-white px-6 py-4 rounded-2xl shadow-xs border border-indigo-100">
+                <div class="text-center">
+                  <div class="text-xs text-slate-400 font-medium">最终得分</div>
+                  <div class="text-4xl font-extrabold text-indigo-600">${res.totalScore}<span class="text-base text-slate-400 font-normal"> / 100</span></div>
+                </div>
+                <div class="h-10 w-px bg-slate-200"></div>
+                <div class="text-center">
+                  <div class="text-xs text-slate-400 font-medium">错题数量</div>
+                  <div class="text-2xl font-bold ${totalWrong === 0 ? "text-emerald-600" : "text-rose-600"}">${totalWrong} 题</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 九大题得分明细表 -->
+            <div class="mt-4">
+              <div class="text-xs font-bold text-slate-500 mb-2.5">各部分得分明细（总分 100 分）：</div>
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                ${res.breakdown.map(b => {
+                  const isFull = b.score === b.full;
+                  return `
+                    <div class="bg-white px-3.5 py-2.5 rounded-xl border border-slate-200/80 flex items-center justify-between text-sm">
+                      <span class="text-slate-700 font-medium truncate pr-2">${b.name}</span>
+                      <span class="font-bold shrink-0 ${isFull ? "text-emerald-600" : "text-amber-600"}">
+                        ${b.score} / ${b.full} 分
+                      </span>
+                    </div>
+                  `;
+                }).join("")}
+              </div>
+            </div>
+          </div>
+        ` : ""}
+
+        <!-- 专属错题本区块 -->
+        <div>
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
+            <div>
+              <h3 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                <span>📕 专属错题本</span>
+                <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-700">
+                  待订正 ${unfixedCount} 题 · 已订正 ${fixedCount} 题
+                </span>
+              </h3>
+              <p class="text-xs text-slate-500 mt-1">所有答错或未作答的题目已自动收录于此，可在下方直接输入正确答案进行在线订正。</p>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2">
+              <button onclick="copyWrongBookText()"
+                class="px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-800 text-white hover:bg-slate-700 transition">
+                📋 复制错题本内容
+              </button>
+              <button onclick="retakeExam()"
+                class="px-3.5 py-2 rounded-xl text-xs font-bold bg-indigo-100 text-indigo-700 hover:bg-indigo-200 transition">
+                🔄 重新再考一次
+              </button>
+            </div>
+          </div>
+
+          <!-- 筛选标签 -->
+          ${totalWrong > 0 ? `
+            <div class="flex items-center gap-2 mb-4">
+              ${[
+                { key: "all", label: `全部错题 (${totalWrong})` },
+                { key: "unfixed", label: `待订正 (${unfixedCount})` },
+                { key: "fixed", label: `已订正 (${fixedCount})` }
+              ].map(tab => `
+                <button onclick="setWrongBookFilter('${tab.key}')"
+                  class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition ${
+                    state.wrongBookFilter === tab.key
+                      ? "bg-indigo-600 text-white"
+                      : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                  }">
+                  ${tab.label}
+                </button>
+              `).join("")}
+            </div>
+          ` : ""}
+
+          <!-- 错题列表 -->
+          ${totalWrong === 0 ? `
+            <div class="text-center py-12 bg-emerald-50/60 border border-emerald-200 rounded-2xl">
+              <div class="text-4xl mb-2">🏆</div>
+              <div class="text-lg font-bold text-emerald-800">太厉害了！全卷 100 分满分，没有任何错题！</div>
+              <p class="text-sm text-emerald-600 mt-1">第七课《司马光》和第八课《数星星的孩子》掌握得非常扎实！</p>
+            </div>
+          ` : filteredList.length === 0 ? `
+            <div class="text-center py-10 bg-slate-50 border border-slate-200 rounded-2xl text-sm text-slate-500">
+              当前筛选分类下没有题目哦 ~
+            </div>
+          ` : `
+            <div class="space-y-4">
+              ${filteredList.map((item, idx) => `
+                <div class="p-4 sm:p-5 rounded-2xl border-2 transition ${
+                  item.fixed ? "border-emerald-200 bg-emerald-50/30" : "border-rose-200 bg-rose-50/30"
+                }">
+                  <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+                    <span class="text-xs font-bold px-2.5 py-0.5 rounded-md bg-white border border-slate-200 text-slate-700">
+                      ${item.section}
+                    </span>
+                    <span class="text-xs font-bold px-2.5 py-0.5 rounded-full ${
+                      item.fixed ? "bg-emerald-600 text-white" : "bg-rose-600 text-white"
+                    }">
+                      ${item.fixed ? "✓ 已订正掌握" : "✗ 待订正"}
+                    </span>
+                  </div>
+
+                  <div class="font-bold text-slate-800 text-base mb-3">
+                    ${idx + 1}. ${item.questionText}
+                  </div>
+
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm mb-3">
+                    <div class="p-2.5 rounded-xl bg-white border border-rose-200">
+                      <span class="text-xs text-slate-400 block">你的原答案：</span>
+                      <span class="font-bold text-rose-600">${item.userAnswer}</span>
+                    </div>
+                    <div class="p-2.5 rounded-xl bg-white border border-emerald-200">
+                      <span class="text-xs text-slate-400 block">参考正确答案：</span>
+                      <span class="font-bold text-emerald-700">${item.correctAnswer}</span>
+                    </div>
+                  </div>
+
+                  <div class="text-xs text-slate-600 bg-white/80 p-3 rounded-xl border border-slate-200/80 mb-3 leading-relaxed">
+                    <span class="font-bold text-indigo-700">💡 知识点解析：</span>${item.explain}
+                  </div>
+
+                  <!-- 在线订正输入栏 -->
+                  <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                    <input id="fix_input_${item.uid}" type="text"
+                      placeholder="照着正确答案再练写一遍，点击右侧验证订正"
+                      class="flex-1 px-3.5 py-2 rounded-xl border border-slate-300 bg-white text-sm font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+                    <button onclick="verifyWrongItemFix('${item.uid}')"
+                      class="px-4 py-2 rounded-xl text-xs font-bold bg-emerald-600 text-white hover:bg-emerald-700 transition shrink-0">
+                      ✓ 提交订正并验证
+                    </button>
+                  </div>
+                </div>
+              `).join("")}
+            </div>
+          `}
+        </div>
+      `;
+    }
+
+    function setWrongBookFilter(filterKey) {
+      state.wrongBookFilter = filterKey;
+      renderAll();
+    }
+
+    function verifyWrongItemFix(uid) {
+      const item = state.wrongBook.find(w => w.uid === uid);
+      const inputEl = document.getElementById(`fix_input_${uid}`);
+      if (!item || !inputEl) return;
+
+      const typed = (inputEl.value || "").trim();
+      if (!typed) {
+        showToast("请先在输入框中写出订正后的答案！", "warn");
+        return;
+      }
+
+      const normTyped = normalizeText(typed);
+      let isOk = false;
+      if (item.keywords) {
+        isOk = item.keywords.every(kw => typed.includes(kw));
+      } else {
+        isOk = (item.acceptedList || [item.correctAnswer]).some(ans => normalizeText(ans) === normTyped);
+      }
+
+      if (isOk) {
+        item.fixed = true;
+        saveWrongBookToLocal();
+        showToast("订正正确！这道错题已标记为【已订正掌握】！", "success");
+        renderAll();
+      } else {
+        showToast("订正还差一点点，请对照上方绿色【参考正确答案】再写一遍哦！", "warn");
+      }
+    }
+
+    function copyWrongBookText() {
+      if (state.wrongBook.length === 0) {
+        showToast("当前没有错题需要复制哦！", "info");
+        return;
+      }
+      const lines = [
+        "【小学四年级中文第七、八课模拟考 · 专属错题本】",
+        ...state.wrongBook.map((w, i) =>
+          `${i + 1}. [${w.section}] ${w.questionText}\n   原答案：${w.userAnswer} ｜ 正确答案：${w.correctAnswer}\n   解析：${w.explain}`
+        )
+      ];
+      const textArea = document.createElement("textarea");
+      textArea.value = lines.join("\n\n");
+      document.body.appendChild(textArea);
+      textArea.select();
+      try {
+        document.execCommand("copy");
+        showToast("错题本内容已复制到剪贴板，可直接粘贴发送！", "success");
+      } catch (e) {
+        showToast("复制失败，请手动选中文本复制。", "warn");
+      }
+      document.body.removeChild(textArea);
+    }
+
+    function retakeExam() {
+      state.isSubmitted = false;
+      state.gradingResult = null;
+      state.timerSeconds = 0;
+      state.activePart2Box = "leftRight";
+      state.activePart3Left = null;
+      state.activePart4Group = "xin";
+      state.activePart6Blank = "p6_1";
+      state.answers = {
+        part1: {},
+        part1Strokes: {},
+        part2: { leftRight: [], topBottom: [], single: [] },
+        part3: {},
+        part4: { xin: [], shi: [], fei: [], dou: [] },
+        part5: {},
+        part6: {},
+        part7: { p7_1: [], p7_2: [], p7_3: [], p7_4: [], p7_5: [] },
+        part8: {},
+        part9: {}
+      };
+      showToast("试卷已重置，加油再挑战一次满分吧！", "info");
+      goToPage(1);
+    }
+  </script>
+</body>
+</html>
